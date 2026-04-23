@@ -1,0 +1,89 @@
+---
+title: "Final project notes"
+format: html
+---
+
+Overall plan: 1. Use SIPP to create predictive model for household assets (or perhaps for simplicity, just impute the likelihood that a household has assets above limit).
+
+2.  Apply model to ACS to impute household assets. (Do we want to just use gross income, or also net income which excludes deductions? That would be more accurate, but would require more imputation from SIPP).
+
+3.  Merge SNAP policy database data with eligibility requirements to ACS. I'm thinking that the data would be organized with rows = households, and the income and asset threshold variables would be account for household size/state.
+
+4. Calculate eligibility based on 2019 policy environment
+
+5. Simulate different policy scenarios - changes to income and asset thresholds, potentially work requirements. Concern with work requirements is behavioral response
+
+Consider how to deal with debt - how does SNAP eligibility handle that?
+
+"Imputation is not prediction" - consider how we'll want to sample from it
+
+Don't forget the weights
+
+## Federal eligibility requirements
+(https://www.congress.gov/crs-product/R42505)
+
+Household definition: person living alone, or people living together who purchase/prepare food together
+
+###Income thresholds
+
+**Gross income \<= 130% FPL**
+
+**Net income \<= 100% FPL** 
+
+**Deductions for net income:** 
+Standard deduction: A monthly deduction that varies by household size and is indexed for inflation (see below for details). Every applicant household gets this deduction. 
+Earned income deduction: 20% of any earned income, in recognition of taxes and work expenses. 
+Child support deduction: Any amounts paid out as legally obligated child support, unless already excluded (at the option of the state) from gross income. 
+Dependent care deduction: Out-of-pocket dependent care expenses, when related to work or training. 
+Excess shelter deduction: Shelter expenses that exceed 50% of net income after all other deductions, typically expenses that exceed about one-third of gross monthly income (see below for limits). Shelter expenses include utility costs, which states may standardize with a standard utility allowance calculation.
+
+### Asset thresholds
+
+\$3,000, or \$4,500 if household includes elderly or disabled member. Includes cash, bank accounts, stocks/bonds, car
+
+Some assets excluded:
+Primary home
+Most retirement accounts
+Resources of SSI/TANF recipients
+
+Many states waive or increase asset thresholds via BBCE
+
+### Work Requirements
+**General work requirements:**
+Register for work
+Accept a suitable job if offered one
+Fulfill any work, job search, or training requirements established by administering state SNAP agencies
+Provide the administering public assistance agency with sufficient information to allow a determination with respect to their job availability
+Not voluntarily quit a job without good cause or reduce work effort below 30 hours a week.
+
+**ABAWD requirements:**
+Able-bodied adults without dependents (ABAWDs) must meet some additional requirements:
+Work at least 20 hours per week
+Participate in an employment and training program for at least 20 hours per week
+Participate in a state's workfare program
+
+In each 36-month period, ABAWDs are allowed 3 months where they do not meet these requirements.
+
+Some states have waived ABAWD work requirements for the entire state or for certain geographic areas
+
+## Set up
+
+```{r}
+library(tidyverse)
+library(readxl)
+
+snapdb <- read_xlsx('/Users/JohnnyWilling/Documents/Grad school/Spring 2026/PPOL 6891 Advanced Data Science/Final Project/SNAPPolicyDatabase.xlsx',
+                    sheet = "SNAP Policy Database") |>
+  filter(yearmonth == 201912) |>
+  select(starts_with("state"), starts_with("bbce"), starts_with("veh"))
+
+```
+
+## Microsim logic
+
+```{r}
+snap_elig <- function(hh_gross_inc, gross_inc_thresh, hh_net_inc, net_inc_thresh, hh_assets, asset_thresh, ) {
+  
+}
+
+```
