@@ -22,7 +22,7 @@ Don't forget the weights
 ## Federal eligibility requirements
 (https://www.congress.gov/crs-product/R42505)
 
-Household definition: person living alone, or people living together who purchase/prepare food together
+Household definition: person living alone, or people living together who purchase/prepare food together. SIPP does not ask about who purchases/prepares food together, but we can approximate with household relationship variables.
 
 ###Income thresholds
 
@@ -36,6 +36,7 @@ Earned income deduction: 20% of any earned income, in recognition of taxes and w
 Child support deduction: Any amounts paid out as legally obligated child support, unless already excluded (at the option of the state) from gross income. 
 Dependent care deduction: Out-of-pocket dependent care expenses, when related to work or training. 
 Excess shelter deduction: Shelter expenses that exceed 50% of net income after all other deductions, typically expenses that exceed about one-third of gross monthly income (see below for limits). Shelter expenses include utility costs, which states may standardize with a standard utility allowance calculation.
+Out-of-pocket medical expense deduction: Any medical costs over $35 per month for elderly and disabled members of SNAP unit
 
 ### Asset thresholds
 
@@ -66,16 +67,66 @@ In each 36-month period, ABAWDs are allowed 3 months where they do not meet thes
 
 Some states have waived ABAWD work requirements for the entire state or for certain geographic areas
 
+## 2019 SIPP variables required:
+### Household structure and demographics
+ERELRPE (household relationship)
+RREL* (also household relationship)
+ET2REL* (relationship to Type 2 person - lived in household during reference period, but since moved)
+TAGE (person's age in years)
+ECITIZEN (US citizenship status)
+EDISABL (disability status)
+ESEX (person's sex)
+TAGE_EHC (monthly age during reference period)
+ERACE (person's race)
+EORIGIN (person's hispanic/latino origin)
+EEDUC (person's education level)
+RSSI_MNYN (received SSI benefits this month)
+
+### Income
+TPTOTINC (total personal income, including from work, assets/investments, and program participation)
+TPEARN (total personal earnings)
+
+### Deductions
+TAMOUNTPAID (child support payments)
+TPAYWK (typical weekly child care payment in fall of reference year)
+TRENTMORT (amount household paid for rent or mortgage in December of reference year)
+TUTILS (amount the household paid for utilities in December of reference year)
+THVAL_RMU (amount household paid for rent, mortgage, and utilities in December of reference year)
+
+### Assets
+
+
+### SNAP receipt, for validation
+RFSCOV (SNAP receipt any time in reference year)
+RFSYN (SNAP receipt this month)
+
 ## Set up
 
 ```{r}
 library(tidyverse)
 library(readxl)
+library(data.table)
 
-snapdb <- read_xlsx('/Users/JohnnyWilling/Documents/Grad school/Spring 2026/PPOL 6891 Advanced Data Science/Final Project/SNAPPolicyDatabase.xlsx',
+snapdb <- read_xlsx('/Users/JohnnyWilling/Documents/Grad school/Spring 2026/PPOL 6891 Advanced Data Science/final_project/data/SNAPPolicyDatabase.xlsx',
                     sheet = "SNAP Policy Database") |>
-  filter(yearmonth == 201912) |>
+  filter(yearmonth == 201907) |>
   select(starts_with("state"), starts_with("bbce"), starts_with("veh"))
+
+sipp2019 <- fread('/Users/JohnnyWilling/Documents/Grad school/Spring 2026/PPOL 6891 Advanced Data Science/final_project/data/pu2019.csv',
+                  sep = "|", select = c(
+  
+  #Common case identification variables
+	'SSUID','PNUM','MONTHCODE','ERESIDENCEID','ERELRPE','SPANEL','SWAVE', "TEHC_ST", "TST_INTV"
+	
+	#The base weight
+	'WPFINWGT',
+	
+	#Common demographics variables, including age at time of interview (TAGE)
+	#	and monthly age during the reference period (TAGE_EHC)
+	'ESEX','TAGE','TAGE_EHC','ERACE','EORIGIN','EEDUC',
+	
+	#Example additional variables for analysis
+	'TPTOTINC'))
 
 ```
 
