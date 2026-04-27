@@ -118,6 +118,8 @@ EWELACTV2_2 (attended job search program)
 EWELACTV2_3 (attended training for job skills)
 EWELACTV4 (participated in work experience program in exchange for TANF)
 
+NOTE: training variables are only yes/no, don't capture detail about how much time spent in training
+
 ### SNAP receipt, for validation
 RFSCOV (SNAP receipt any time in reference year)
 RFSYN (SNAP receipt this month)
