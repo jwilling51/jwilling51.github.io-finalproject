@@ -363,10 +363,12 @@ snap_sipp <- hh_sipp |>
     # Work requirements: single, non-elderly, non-disabled, age 18–49
     # Simplified to household level — ideally flagged at person level
     has_abawd  = hh_size == 1 & !has_elderly & !has_disabled & !has_ssi & !has_tanf,
-    # Treating partial exemption as full exemption.
-    work_elig  = work_req %in% c("full_exemption", "partial_exemption") | !has_abawd,
+    work_elig  = work_req %in% c("full_exemption") | !has_abawd,
     # Final eligibility
     snap_eligible = (cat_elig | (gross_elig & net_elig)) & asset_elig & work_elig)
+
+snap_eligible <- snap_sipp |>
+  filter(snap_eligible == TRUE)
 ```
 
 **Basic Descriptive Statistics of how many families**
@@ -388,3 +390,11 @@ snap_sipp |>
     pct_eligible        = round(weighted.mean(snap_eligible, weight, na.rm = TRUE) * 100, 1)
   )
 ```
+
+
+BIG NOTES: 
+CURRENTLY OVERCOUNTING
+NEED TO ADD IN WORK INFORMATION HOURS, ETC, 
+NEED TO EDIT IN REVISED ASSET STUFF
+MIGHT NEED TO FIX MEDICAL EXPENSES
+
