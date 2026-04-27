@@ -1,0 +1,390 @@
+---
+title: "Final project notes"
+format: html
+editor: 
+  markdown: 
+    wrap: 72
+---
+
+Overall plan:
+
+1.  Use SIPP to create predictive model for household assets (or perhaps
+    for simplicity, just impute the likelihood that a household has
+    assets above limit).
+
+2.  Apply model to ACS to impute household assets. (Do we want to just
+    use gross income, or also net income which excludes deductions? That
+    would be more accurate, but would require more imputation from
+    SIPP).
+
+3.  Merge SNAP policy database data with eligibility requirements to
+    ACS. I'm thinking that the data would be organized with rows =
+    households, and the income and asset threshold variables would be
+    account for household size/state.
+
+4.  Calculate eligibility based on 2019 policy environment
+
+5.  Simulate different policy scenarios - changes to income and asset
+    thresholds, potentially work requirements. Concern with work
+    requirements is behavioral response
+
+Consider how to deal with debt - how does SNAP eligibility handle that?
+
+"Imputation is not prediction" - consider how we'll want to sample from
+it
+
+Don't forget the weights
+
+## Federal eligibility requirements
+
+(https://www.congress.gov/crs-product/R42505)
+
+Household definition: person living alone, or people living together who
+purchase/prepare food together. SIPP does not ask about who
+purchases/prepares food together, but we can approximate with household
+relationship variables.
+
+###Income thresholds
+
+**Gross income \<= 130% FPL**
+
+**Net income \<= 100% FPL**
+
+**Deductions for net income:** Standard deduction: A monthly deduction
+that varies by household size and is indexed for inflation (see below
+for details). Every applicant household gets this deduction. Earned
+income deduction: 20% of any earned income, in recognition of taxes and
+work expenses. Child support deduction: Any amounts paid out as legally
+obligated child support, unless already excluded (at the option of the
+state) from gross income. Dependent care deduction: Out-of-pocket
+dependent care expenses, when related to work or training. Excess
+shelter deduction: Shelter expenses that exceed 50% of net income after
+all other deductions, typically expenses that exceed about one-third of
+gross monthly income (see below for limits). Shelter expenses include
+utility costs, which states may standardize with a standard utility
+allowance calculation. Out-of-pocket medical expense deduction: Any
+medical costs over \$35 per month for elderly and disabled members of
+SNAP unit
+
+### Asset thresholds
+
+\$3,000, or \$4,500 if household includes elderly or disabled member.
+Includes cash, bank accounts, stocks/bonds, car
+
+Some assets excluded: Primary home Most retirement accounts Resources of
+SSI/TANF recipients
+
+Many states waive or increase asset thresholds via BBCE
+
+### Work Requirements
+
+**General work requirements:** Register for work Accept a suitable job
+if offered one Fulfill any work, job search, or training requirements
+established by administering state SNAP agencies Provide the
+administering public assistance agency with sufficient information to
+allow a determination with respect to their job availability Not
+voluntarily quit a job without good cause or reduce work effort below 30
+hours a week.
+
+**ABAWD requirements:** Able-bodied adults without dependents (ABAWDs)
+must meet some additional requirements: Work at least 20 hours per week
+Participate in an employment and training program for at least 20 hours
+per week Participate in a state's workfare program
+
+In each 36-month period, ABAWDs are allowed 3 months where they do not
+meet these requirements.
+
+Some states have waived ABAWD work requirements for the entire state or
+for certain geographic areas
+
+## 2019 SIPP variables required:
+
+### Household structure and demographics
+
+ERELRPE (household relationship)
+
+RREL (also household relationship)
+
+ET2REL (relationship to Type 2 person - lived in household during
+reference period, but since moved) TAGE (person's age in years)
+
+ECITIZEN (US citizenship status)
+
+EDISABL (disability status)
+
+ESEX (person's sex)
+
+TAGE_EHC (monthly age during reference period) ERACE (person's race)
+EORIGIN (person's hispanic/latino origin) EEDUC (person's education
+level) RSSI_MNYN (received SSI benefits this month)
+
+### Income
+
+TPTOTINC (total personal income, including from work,
+assets/investments, and program participation) TPEARN (total personal
+earnings)
+
+### Deductions
+
+TAMOUNTPAID (child support payments) TPAYWK (typical weekly child care
+payment in fall of reference year) TRENTMORT (amount household paid for
+rent or mortgage in December of reference year) TUTILS (amount the
+household paid for utilities in December of reference year) THVAL_RMU
+(amount household paid for rent, mortgage, and utilities in December of
+reference year)
+
+### Assets
+
+### SNAP receipt, for validation
+
+RFSCOV (SNAP receipt any time in reference year) RFSYN (SNAP receipt
+this month)
+
+## Set up
+
+Loading in Policy Database
+
+```{r}
+library(tidyverse)
+library(readxl)
+library(data.table)
+
+snapdb <- read_xlsx("SNAPPolicyDatabase.xlsx", sheet = "SNAP Policy Database") |>
+  filter(yearmonth == 201907) |>
+  select(starts_with("state"), starts_with("bbce"), starts_with("veh"))
+
+## For Work Requirements
+link <- "https://fns-prod.azureedge.us/sites/default/files/media/file/FY19-Quarter4-ABAWD-Waiver-Status.pdf"
+
+# Exempt States
+state_exempt <- c("Alaska", "District of Columbia", "Louisiana", "New Mexico")
+
+# State fully not exempt
+state_nonexempt <- c("Alabama", "Arkansas", "Delaware", "Florida", "Indiana", "Iowa", "Kansas", "Maine", "Mississippi", "Missouri", "Nebraska", "North Carolina", "Oklahoma", "South Carolina", "Texas", "Wisconsin", "Wyoming")
+
+# Modify Rules to Accuont for Work Requirements
+snapdb <- snapdb |>
+  mutate(work_req = case_when(
+    statename %in% state_exempt    ~ "full_exemption",
+    statename %in% state_nonexempt ~ "no_exemption",
+    TRUE                       ~ "partial_exemption"
+  ))
+
+```
+
+Loading in SIPP
+
+```{r}
+require("data.table")
+require("bit64")
+require("dplyr")
+
+ds <- "data/pu2019.csv"
+
+# Read all column names first so we can pattern-match
+all_cols <- names(fread(ds, sep = "|", nrows = 0))
+
+exact_vars <- c(
+  # ID variables
+  'SSUID', 'PNUM', 'MONTHCODE', 'ERESIDENCEID', 'ERELRPE', 'SPANEL', 'SWAVE',
+  'SHHADID', 'THHLDSTATUS', 'RIN_UNIV',
+
+  # Base weight
+  'WPFINWGT',
+
+  # State of residence
+  'TEHC_ST', 'TST_INTV',
+
+  # Demographics
+  'ESEX', 'TAGE', 'TAGE_EHC', 'ERACE', 'EORIGIN', 'EEDUC',
+  'ECITIZEN', 'ENATIVITY', 'EIMM_STAT',
+  'EDISABL', 'RDIS', 'RDIS_ALT', 
+
+  # Household structure
+  'TLIVQTR', 'ETENURE', 'EMS',
+
+  # Income
+  'TPTOTINC', 'TPEARN', 'TFTOTINC',
+  'TUNEMP_AMT', 'TSSI_AMT', 'TSSRX', 'TSSXAMT', 'TTANF_AMT',
+
+  # Deductions
+  'TAMOUNTPAID', 'TPAYWK', 'TRENTMORT', 'TUTILS', 'THVAL_RMU',
+  'TCHCARE_AMT', 'TMOOP',
+
+  # Assets
+  'THNETWORTH', 'ERET_LUMPSUM', 'TDRAW_AMT',
+
+  # Program participation (for eligibility & validation)
+  'RFSCOV', 'RSNAP_MNYN', 'RTANF_MNYN', 'RSSI_MNYN', 'RWICYN'
+)
+
+patterns <- c(
+  "^RREL",   # household relationship
+  "^ET2REL", # relationship to Type 2 person
+  "^SNAP",
+  "^TEHC",
+  "^EOWN", "^EJSOWN", "^EJOOWN", "^EOOWN", # asset ownership
+  "^TJS", "^TJO", "^VAL",
+  "^EVEH", "^TVEH"  # vehicles
+)
+
+pattern_vars <- unique(unlist(lapply(patterns, function(p) grep(p, all_cols, value = TRUE))))
+
+keep_vars <- unique(c(exact_vars, pattern_vars))
+keep_vars <- keep_vars[keep_vars %in% all_cols]
+
+pu <- fread(ds, sep = "|", select = keep_vars)
+names(pu) <- toupper(names(pu))
+
+head(pu, 20)
+mean(pu[["TPTOTINC"]], na.rm = TRUE)
+
+# Replicate weights
+dw <- "data/rw2019.csv"
+rw <- fread(dw, sep = "|")
+names(rw) <- toupper(names(rw))
+
+sipp2019 <- left_join(pu, rw, by = c("SSUID", "PNUM", "MONTHCODE"))
+
+head(sipp2019, 20)
+```
+
+## Microsim logic
+
+**Filtering SIPP to only include July 2019**
+
+-   Doesn't matter too much when they started (2018, 2019) as long as
+    they were in the panel in that month. RIN_UNIV captures this.
+
+```{r}
+sipp_0719 <- sipp2019 |>
+  filter(RIN_UNIV == 1 & MONTHCODE == 7) #
+```
+
+**FPL and Standard Deduction Amounts**
+
+```{r}
+# Monthly FPL thresholds for contiguous us and dc (2019)
+"https://aspe.hhs.gov/topics/poverty-economic-mobility/poverty-guidelines/prior-hhs-poverty-guidelines-federal-register-references/2019-poverty-guidelines"
+fpl_monthly    <- c(1041, 1410, 1778, 2146, 2515, 2883, 3251, 3620)
+fpl_additional <- 369  # after 8 people uniform increase
+
+# Standard deduction by household size which only increases up to 6 people, 2019
+"https://cvlas.org/wp-content/uploads/2022/08/supp-nutrition-assist-prog-SNAP-2019.pdf"
+std_ded_tbl <- c(167, 167, 167, 178, 208, 238)
+
+# Excess shelter deduction cap for non-elderly/non-disabled households, 2019
+shelter_cap <- 552
+
+get_fpl <- function(n) {
+  fpl_monthly[pmin(n, 8)] + pmax(n - 8, 0) * fpl_additional 
+  } # if more than 8 just adds uniform additional ammount
+
+get_std_ded <- function(n) {
+  std_ded_tbl[pmin(n, 6)]
+  } # more than 6, just applies 6
+
+```
+
+**Aggregate to SNAP filing units**
+
+SNAP filing units are people who live together and purchase/prepare food
+together. SIPP does not ask about food purchasing, so we approximate
+with household (SSUID).
+
+```{r}
+hh_sipp <- sipp_0719 |>
+  group_by(SSUID) |>
+  summarise(
+    # flags
+    hh_size = n(),
+    has_elderly = any(TAGE >= 60, na.rm = TRUE), 
+    has_disabled = any(RDIS == 1, na.rm = TRUE), # simple disability def.
+    has_ssi = any(RSSI_MNYN == 1, na.rm = TRUE), # for bbce
+    has_tanf = any(RTANF_MNYN == 1, na.rm = TRUE), # Might need to check this
+    # Income
+    hh_gross_inc = sum(TPTOTINC, na.rm = TRUE), # all forms of earnigns
+    hh_earn = sum(TPEARN,   na.rm = TRUE), # earned income
+    # Deductions
+    child_sup_ded = sum(TAMOUNTPAID, na.rm = TRUE), # how much child support paid
+    child_care_ded = sum(TPAYWK * 4, na.rm = TRUE), # child care weekly times 4 for month 
+    medical_costs = 0, # struggled to pull variable might need to revisit
+    # Shelter costs (in December of reference period)
+    shelter_costs = first(na.omit(THVAL_RMU)), # inclues, rent mortgage, utilites for hh
+    # Assets 
+    net_worth = first(na.omit(THNETWORTH)), # household net worth. 
+    state_fips = first(TEHC_ST),
+    weight = first(WPFINWGT),
+    # Actual SNAP receipiency we can use this to compare, although we are interested in the eligible population. 
+    snap_actual = any(RSNAP_MNYN == 1, na.rm = TRUE)
+  )
+```
+
+### Step 3 — Thresholds, policy merge, net income, and eligibility
+
+```{r}
+# Joining in snap eligibility rules to sipp
+snap_sipp <- hh_sipp |>
+  left_join(snapdb, by = "state_fips") |>
+  # Now we have to add in eligibility rules
+  mutate(
+    # FPL thresholds
+    fpl = get_fpl(hh_size),
+    gross_limit = fpl * 1.30,
+    net_limit   = fpl * 1.00,
+    asset_limit = if_else(has_elderly | has_disabled, 4500, 3000),
+    # Net income deductions
+    std_ded = get_std_ded(hh_size),
+    earn_ded  = hh_earn * 0.20,
+    net_pre_shelter = pmax(hh_gross_inc - std_ded - earn_ded 
+                           - child_sup_ded - child_care_ded, 0),
+    shelter_excess = pmax(shelter_costs - 0.50 * net_pre_shelter, 0),
+    shelter_ded = if_else(has_elderly | has_disabled, 
+                          shelter_excess, pmin(shelter_excess, shelter_cap)),
+    medical_ded = if_else(has_elderly | has_disabled, pmax(medical_costs - 35, 0), 0),
+    net_inc = pmax(net_pre_shelter - shelter_ded - medical_ded, 0),
+    # Categorical eligibility: SSI/TANF recipients skip income and asset tests
+    cat_elig = has_ssi | has_tanf,
+    # BBCE: states may waive asset test and raise gross income limit
+    # Logic of this next section is do they have bbce, if so use that income limit and asset test. 
+    bbce_on = !is.na(bbce) & bbce == 1,
+    gross_limit_eff = if_else(
+      bbce_on & bbce_inclmt > 0,
+      fpl * (bbce_inclmt / 100),
+      gross_limit),
+    asset_test_on   = !(bbce_on & !is.na(bbce_asset) & bbce_asset == 1),
+    asset_limit_eff = case_when(
+      bbce_on & bbce_a_amt > 0 ~ bbce_a_amt * 1000,
+      TRUE ~ asset_limit),
+    # Individual tests
+    gross_elig = hh_gross_inc <= gross_limit_eff,
+    net_elig   = net_inc      <= net_limit,
+    asset_elig = !asset_test_on | cat_elig | (net_worth <= asset_limit_eff),
+    # Work requirements: single, non-elderly, non-disabled, age 18–49
+    # Simplified to household level — ideally flagged at person level
+    has_abawd  = hh_size == 1 & !has_elderly & !has_disabled & !has_ssi & !has_tanf,
+    # Treating partial exemption as full exemption.
+    work_elig  = work_req %in% c("full_exemption", "partial_exemption") | !has_abawd,
+    # Final eligibility
+    snap_eligible = (cat_elig | (gross_elig & net_elig)) & asset_elig & work_elig)
+```
+
+**Basic Descriptive Statistics of how many families**
+
+```{r}
+# Unweighted numbers
+snap_sipp |>
+  summarize(
+    n_eligible = sum(snap_eligible, na.rm = TRUE),
+    n_total = n(),
+    pct_eligible = round(weighted.mean(snap_eligible, weight, na.rm = TRUE) * 100, 1)
+  )
+
+# Weighted Numbers
+snap_sipp |>
+  summarize(
+    n_eligible_weighted = sum(snap_eligible * weight, na.rm = TRUE),
+    n_total_weighted    = sum(weight, na.rm = TRUE),
+    pct_eligible        = round(weighted.mean(snap_eligible, weight, na.rm = TRUE) * 100, 1)
+  )
+```
