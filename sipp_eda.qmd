@@ -1,0 +1,209 @@
+---
+title: "SIPP EDA"
+author: "Sarah Krause"
+format: html
+editor: visual
+---
+
+# Read in the SIPP data
+
+```{r}
+#Load the "data.table", "dplyer", and "bit64" libraries
+install.packages("data.table")
+library(data.table)
+install.packages("bit64")
+library(bit64)
+install.packages("dplyr")
+library(dplyr)
+install.packages("haven")
+library(haven)
+library(ggplot2)
+```
+
+```{r}
+# Step 1: Read all named columns plus pattern-matched ones
+all_cols <- names(fread(ds, sep = "|", nrows = 0))
+
+# Step 2: Define exact variables
+exact_vars <- c(
+  # ID variables
+  'SSUID', 'PNUM', 'MONTHCODE', 'ERESIDENCEID', 'ERELRPE', 'SPANEL', 'SWAVE',
+  'SHHADID', 'THHLDSTATUS', 'RIN_UNIV',
+
+  # Base weight
+  'WPFINWGT',
+
+  # State of residence
+  'TEHC_ST', 'TST_INTV',
+
+  # Income
+  'TPTOTINC', 'TFTOTINC', 'THNETWORTH', 'TPEARN',
+  'TUNEMP_AMT', 'TSSI_AMT', 'TSSRX', 'TSSXAMT',
+  'TTANF_AMT', 'TVET_AMT', 'TWIC_AMT', 'TCSPP_AMT', 'TCSPR_AMT',
+
+  # Deductions
+  'TCHCARE_AMT', 'TMOOP',
+
+  # Household composition & filing unit
+  'TLIVQTR', 'ETENURE', 'EMS', 'EMS_EHC', 'EENROLL', 'ESCHOOL',
+
+  # Demographics
+  'ESEX', 'TAGE', 'TAGE_EHC', 'ERACE', 'EORIGIN', 'EEDUC',
+
+  # Citizenship & immigration
+  'ENATIVITY', 'ECITIZEN', 'EIMM_STAT', 'TYEAR_ENTRY',
+
+  # Categorical eligibility & disability
+  'ESSIV', 'ETANF', 'RDIS', 'RDIS_ALT', 'EWIC',
+
+  # Assets
+  'ERET_LUMPSUM', 'TDRAW_AMT'
+)
+
+# Step 3: Define patterns for prefix/suffix matched variables
+patterns <- c(
+  "^SNAP", "^TEHC", "^TCHCARE", "^TMED", "^EDIS", "^EMED",
+  "^EOWN", "^EJSOWN", "^EJOOWN", "^EOOWN",
+  "^TJS", "^TJO", "^VAL", "^TO",
+  "^EVEH", "^TVEH"
+)
+
+pattern_vars <- unique(unlist(lapply(patterns, function(p) grep(p, all_cols, value = TRUE))))
+
+# Step 4: Combine, keep only cols that exist, and read
+keep_vars <- unique(c(exact_vars, pattern_vars))
+keep_vars <- keep_vars[keep_vars %in% all_cols]
+
+pu <- fread(ds, sep = "|", select = keep_vars)
+```
+
+```{r}
+# Make sure all the column names are upper-case 
+names(pu) <- toupper(names(pu))
+
+# Preview the data 
+head(pu, 20)
+
+```
+
+# EDA
+
+```{r}
+# Flag person-months that are in-universe (RIN_UNIV == 1)
+pu_active <- pu[RIN_UNIV == 1]
+nrow(pu_active)
+
+cat("Unique individuals:", pu_active[, uniqueN(paste(SSUID, PNUM))], "\n")
+cat("Unique households:", pu_active[, uniqueN(SSUID)], "\n")
+cat("Months observed:", sort(unique(pu_active$MONTHCODE)), "\n\n")
+```
+
+```{r}
+# missingness
+tibble(variable = names(pu_active),
+       pct_missing = colMeans(is.na(pu_active)) * 100) |>
+  arrange(desc(pct_missing))
+```
+
+# Distribution of personal and family income
+
+```{r}
+ 
+pu_active[, .(
+  N        = .N,
+  N_zero   = sum(TPTOTINC == 0, na.rm = TRUE),
+  N_neg    = sum(TPTOTINC < 0,  na.rm = TRUE),
+  mean     = round(weighted.mean(TPTOTINC, WPFINWGT, na.rm = TRUE), 2),
+  median   = round(median(TPTOTINC, na.rm = TRUE), 2),
+  p25      = round(quantile(TPTOTINC, 0.25, na.rm = TRUE), 2),
+  p75      = round(quantile(TPTOTINC, 0.75, na.rm = TRUE), 2),
+  p95      = round(quantile(TPTOTINC, 0.95, na.rm = TRUE), 2),
+  max      = max(TPTOTINC, na.rm = TRUE)
+)]
+
+pu_active[, .(
+  N        = .N,
+  N_zero   = sum(TFTOTINC == 0, na.rm = TRUE),
+  N_neg    = sum(TFTOTINC < 0,  na.rm = TRUE),
+  mean     = round(weighted.mean(TFTOTINC, WPFINWGT, na.rm = TRUE), 2),
+  median   = round(median(TFTOTINC, na.rm = TRUE), 2),
+  p25      = round(quantile(TFTOTINC, 0.25, na.rm = TRUE), 2),
+  p75      = round(quantile(TFTOTINC, 0.75, na.rm = TRUE), 2),
+  p95      = round(quantile(TFTOTINC, 0.95, na.rm = TRUE), 2),
+  max      = max(TFTOTINC, na.rm = TRUE)
+)]
+ 
+p95_fam <- quantile(pu_active$TFTOTINC, 0.95, na.rm = TRUE)
+ 
+ggplot(pu_active[TFTOTINC >= 0 & TFTOTINC <= p95_fam],
+       aes(x = TFTOTINC, weight = WPFINWGT)) +
+  geom_histogram(bins = 60, fill = "#2c7bb6", color = "white", linewidth = 0.2) +
+  scale_x_continuous(labels = scales::dollar_format(prefix = "$")) +
+  labs(
+    title    = "Distribution of Monthly Family Income (TFTOTINC)",
+    subtitle = "Weighted; capped at 95th percentile; in-universe person-months",
+    x        = "Monthly Family Income ($)",
+    y        = "Weighted Count"
+  ) +
+  theme_minimal()
+```
+
+# Income by state
+
+```{r}
+state_income <- pu_active[, .(
+  mean_fam_income   = round(weighted.mean(TFTOTINC, WPFINWGT, na.rm = TRUE), 0),
+  median_fam_income = round(median(TFTOTINC, na.rm = TRUE), 0),
+  pct_zero_income   = round(100 * weighted.mean(TFTOTINC == 0, WPFINWGT, na.rm = TRUE), 1)
+), by = TEHC_ST][order(TEHC_ST)]
+state_income
+ 
+```
+
+# Earned vs. Unearned Income
+
+```{r}
+pu_active[, income_type := fcase(
+  TPEARN > 0 & (TPTOTINC - TPEARN) <= 0, "Earned only",
+  TPEARN <= 0 & (TPTOTINC - TPEARN) > 0, "Unearned only",
+  TPEARN > 0 & (TPTOTINC - TPEARN) > 0,  "Both",
+  default = "No income"
+)]
+ 
+income_type_summary <- pu_active[, .(
+  weighted_n = sum(WPFINWGT),
+  pct        = round(100 * sum(WPFINWGT) / sum(pu_active$WPFINWGT), 1)
+), by = income_type][order(-pct)]
+income_type_summary
+ 
+ggplot(income_type_summary, aes(x = reorder(income_type, pct), y = pct)) +
+  geom_col(fill = "#756bb1") +
+  coord_flip() +
+  labs(
+    title    = "Income Composition of Person-Months",
+    subtitle = "Weighted; in-universe person-months",
+    x        = NULL,
+    y        = "% of Person-Months"
+  ) +
+  theme_minimal()
+ 
+```
+
+# SNAP Policy Database
+
+```{r}
+library(readxl)
+library(here)
+
+spd <- read_excel(here("data", "SNAPPolicyDatabase.xlsx"),
+                  sheet = "SNAP Policy Database")
+
+
+```
+
+Select september 2019
+
+```{r}
+sept_2010 <- spd |>
+  filter(yearmonth == 201909)
+```
