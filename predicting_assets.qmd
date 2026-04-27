@@ -1,0 +1,205 @@
+---
+title: "Predicting assets"
+format: html
+editor: visual
+---
+
+# Identify variables present in both SIPP and ACS
+
+## Download ACS
+
+```{r}
+library(tidycensus)
+
+census_api_key("2d560565103af2c72e380e7fc9b6d7c345cbf0b4", install = TRUE,
+               overwrite = TRUE)
+```
+
+```{r}
+# Filter to 2019 1-year ACS person-level variables
+pums_vars <- pums_variables %>%
+  filter(year == 2019, survey == "acs1", level == "person")
+
+print(pums_vars)  
+
+# Also look at housing-level variables
+pums_vars_hh <- pums_variables %>%
+  filter(year == 2019, survey == "acs1", level == "housing")
+
+print(pums_vars_hh)
+```
+
+```{r}
+# ACS variables
+acs_person_vars <- c(
+  "AGEP",    # age (-> age_head, has_elderly, has_children)
+  "SEX",     # sex
+  "RAC1P",   # race
+  "HISP",    # Hispanic origin
+  "CIT",     # citizenship status
+  "NATIVITY",# nativity (native vs foreign-born)
+  "SCHL",    # educational attainment
+  "ESR",     # employment status
+  "WAGP",    # wages/salary income
+  "SEMP",    # self-employment income
+  "RETP",    # retirement income
+  "SSP",     # Social Security income
+  "SSIP",    # SSI income
+  "PAP",     # public assistance income
+  "INTP",    # interest/dividend income
+  "PINCP",   # total person income
+  "RELSHIPP" # relationship to householder
+)
+
+acs_hh_vars <- c(
+  "TEN",     # tenure (own vs rent)
+  "HINCP",   # household income
+  "NP",      # number of persons in household
+  "HHT",     # household type
+  "VALP",    # property value
+  "RNTP",    # monthly rent
+  "SMOCP",   # monthly owner costs
+  "FS",      # food stamp / SNAP receipt
+  "PUMA"     # PUMA geography
+)
+
+```
+
+```{r}
+# Pull only a few states
+acs_raw <- get_pums(
+  variables   = c(acs_person_vars, acs_hh_vars),
+  state       = c("LA", "TX", "FL", "AL", "CA"),
+  survey      = "acs1",
+  year        = 2019,
+  rep_weights = "both",
+  recode      = TRUE
+)
+
+# Save locally so no redownloading necessary
+saveRDS(acs_raw, file.path("data", "acs_pums_2019.rds"))   
+```
+
+```{r}
+# Download from data folder
+acs <- readRDS("data/acs_pums_2019.rds")
+```
+
+## Download SIPP
+
+```{r}
+ds <- c("data/pu2019.csv")
+
+all_cols <- names(fread(ds, sep = "|", nrows = 0))
+```
+
+```{r}
+# SIPP variables
+exact_vars <- c(
+  # ID variables
+  'SSUID', 'PNUM', 'MONTHCODE', 'ERESIDENCEID', 'SPANEL', 'SWAVE',
+  'SHHADID', 'THHLDSTATUS', 'RIN_UNIV',
+  
+  # Base weight
+  'WPFINWGT',
+
+  # State of residence
+  'TEHC_ST', 'TST_INTV',
+  
+  # Household structure and demographics 
+  'ERELRPE', # (household relationship)
+  'TAGE', # (person's age in years)
+  'ECITIZEN', # (US citizenship status)
+  'EDISABL', # (disability status)
+  'ESEX',  # (person's sex)
+  'TAGE_EHC', # (monthly age during reference period)
+  'ERACE', #(person's race)
+  'EORIGIN', # (person's hispanic/latino origin)
+  'EEDUC', # (person's education level)
+  'RSSI_MNYN', # (received SSI benefits this month)
+  
+  # Income
+  'TPTOTINC', #(total personal income, including from work, assets/investments, and program participation)
+  'TPEARN', #(total personal earnings)
+  
+  # Deductions
+  'TAMOUNTPAID', # (child support payments)
+  'TPAYWK', # (typical weekly child care payment in fall of reference year)
+  'TRENTMORT', # (amount household paid for rent or mortgage in December of reference year)
+  'TUTILS', # (amount the household paid for utilities in December of reference year)
+  'THVAL_RMU', # (amount household paid for rent, mortgage, and utilities in December of reference year)
+  
+  # SNAP receipt
+  'RFSCOV', # (SNAP receipt any time in reference year)
+  'RFSYN' # (SNAP receipt this month)
+  
+  # Assets
+)
+
+patterns <- c(
+  "^RREL", #(also household relationship)
+  "^ET2REL", # (relationship to Type 2 person - lived in household during reference period, but since moved)
+)
+
+pattern_vars <- unique(unlist(lapply(patterns, function(p) grep(p, all_cols, value = TRUE))))
+
+# Combine, keep only cols that exist, and read
+keep_vars <- unique(c(exact_vars, pattern_vars))
+keep_vars <- keep_vars[keep_vars %in% all_cols]
+
+library(data.table)
+pu <- fread(ds, sep = "|", select = keep_vars)
+```
+
+```{r}
+names(pu) <- toupper(names(pu))
+head(pu, 20)
+```
+
+## SIPP to ACS Crosswalk
+
+| Concept      | ACS variable | SIPP variable                    |
+|--------------|--------------|----------------------------------|
+| Age          | `AGEP`       | `TAGE`                           |
+| Sex          | `SEX`        | `ESEX`                           |
+| Race         | `RAC1P`      | `ERACE`                          |
+| Hispanic     | `HISP`       | `EORIGIN`                        |
+| Citizenship  | `CIT`        | `ECITIZEN`                       |
+| Nativity     | `NATIVITY`   | `ENATIVITY`                      |
+| Education    | `SCHL`       | `EEDUC`                          |
+| Tenure       | `TEN`        | `ETENURE`                        |
+| HH income    | `HINCP`      | `TFTOTINC` (×12 because monthly) |
+| SSI          | `SSIP`       | `TSSI_AMT`                       |
+| SS income    | `SSP`        | `TSSXAMT`                        |
+| SNAP receipt | `FS`         | `RFSCOV, RFSYN`                  |
+| HH size      | `NP`         | derived from `SSUID`             |
+| State        | `ST`         | `TEHC_ST`                        |
+
+# Define outcome variable in SIPP
+
+Find the asset rules for Louisiana in July 2019
+
+```{r}
+# Read in the SNAP policy data
+library(readxl)
+library(here)
+
+spd <- read_excel(here("data", "SNAPPolicyDatabase.xlsx"),
+                  sheet = "SNAP Policy Database")
+```
+
+Examine Louisiana July 2019
+
+```{r}
+spd |>
+  filter(state_pc == "LA") |>
+  filter(yearmonth == 201907)
+```
+
+Louisiana in July 2019 does not use BBCE.
+
+Cap = 1 means they have combined application project (cap) for SSI recipients
+
+Fingerprints not required
+
+excludes vehicles from asset test (?)
