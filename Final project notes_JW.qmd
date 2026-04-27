@@ -59,8 +59,8 @@ Not voluntarily quit a job without good cause or reduce work effort below 30 hou
 
 **ABAWD requirements:**
 Able-bodied adults without dependents (ABAWDs) must meet some additional requirements:
-Work at least 20 hours per week
-Participate in an employment and training program for at least 20 hours per week
+Work at least 20 hours per week, 
+Participate in an employment and training program for at least 20 hours per week, OR
 Participate in a state's workfare program
 
 In each 36-month period, ABAWDs are allowed 3 months where they do not meet these requirements.
@@ -92,9 +92,31 @@ TPAYWK (typical weekly child care payment in fall of reference year)
 TRENTMORT (amount household paid for rent or mortgage in December of reference year)
 TUTILS (amount the household paid for utilities in December of reference year)
 THVAL_RMU (amount household paid for rent, mortgage, and utilities in December of reference year)
+TMDPAY (out-of-pocket medical expenses - not clear about reference time)
 
-### Assets
+### Assets (individual-level values are divided equally if asset is shared)
+TVAL_AST (total value of all of individual's assets)
+TVAL_BANK (total value of all of individual's assets at financial institution)
+TVAL_BOND (total value of individual's other interest-earning assets)
+TVAL_BUS (total value of individual's shares in businesses)
+TVAL_ESAV (total value of individual's educational savings accounts)
+TVAL_HOME (total value of individual's primary residence)
+TVAL_RENT (total value of individual's rental properties)
+TVAL_RE (total value of individual's other real estate holdings)
+TVAL_RET (total value of individual's retirement accounts)
+TVAL_STMF (total value of individual's stock and mutual fund holdings)
+TVAL_VEH (total value of individual's vehicles)
+TVAL_OTH (total value of individual's other assets)
+TVEH1VAL (total value of first vehicle, household level)
+TVEH2VAL (total value of second vehicle, household level)
+TVEH3VAL (total value of third vehicle, household level)
 
+### ABAWD work requirements
+TMWKHRS (average hours per week at all jobs during the reference month)
+EWELACTV2_1 (attended job readiness training)
+EWELACTV2_2 (attended job search program)
+EWELACTV2_3 (attended training for job skills)
+EWELACTV4 (participated in work experience program in exchange for TANF)
 
 ### SNAP receipt, for validation
 RFSCOV (SNAP receipt any time in reference year)
@@ -116,7 +138,7 @@ sipp2019 <- fread('/Users/JohnnyWilling/Documents/Grad school/Spring 2026/PPOL 6
                   sep = "|", select = c(
   
   #Common case identification variables
-	'SSUID','PNUM','MONTHCODE','ERESIDENCEID','ERELRPE','SPANEL','SWAVE', "TEHC_ST", "TST_INTV"
+	'SSUID','PNUM','MONTHCODE','ERESIDENCEID','ERELRPE','SPANEL','SWAVE', "TEHC_ST", "TST_INTV",
 	
 	#The base weight
 	'WPFINWGT',
