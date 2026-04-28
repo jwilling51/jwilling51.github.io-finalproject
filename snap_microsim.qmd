@@ -1,0 +1,366 @@
+---
+title: "SNAP Eligibility Microsimulation"
+format:
+  html:
+    embed-resources: true
+editor:
+  markdown:
+    wrap: 72
+execute:
+  cache: true
+  cache.lazy: false
+---
+
+## Overview
+
+This file is fully self-contained. It loads all data from scratch,
+builds household-level SNAP filing units, defines a vectorized
+eligibility function, and runs baseline and counterfactual policy
+scenarios.
+
+## Libraries
+
+```{r}
+#| cache: false
+library(tidyverse)
+library(readxl)
+library(data.table)
+library(bit64)
+library(skimr)
+```
+
+## Load SNAP Policy Database
+This file contains state by state information on 
+
+```{r}
+snapdb <- read_xlsx("SNAPPolicyDatabase.xlsx", sheet = "SNAP Policy Database") |>
+  filter(yearmonth == 201907) |>
+  select(starts_with("state"), starts_with("bbce"), starts_with("veh"))
+
+# Work requirement tiers based on FY2019 Q4 ABAWD waiver status
+state_exempt <- c("Alaska", "District of Columbia", "Louisiana", "New Mexico")
+
+state_nonexempt <- c("Alabama", "Arkansas", "Delaware", "Florida", "Indiana",
+                     "Iowa", "Kansas", "Maine", "Mississippi", "Missouri",
+                     "Nebraska", "North Carolina", "Oklahoma", "South Carolina",
+                     "Texas", "Wisconsin", "Wyoming")
+
+snapdb <- snapdb |>
+  mutate(work_req = case_when(
+    statename %in% state_exempt ~ "full_exemption",
+    statename %in% state_nonexempt ~ "no_exemption",
+    TRUE ~ "partial_exemption"))
+```
+
+## Load SIPP 2019
+
+```{r}
+#| cache: false
+ds <- "data/pu2019.csv"
+
+all_cols <- names(fread(ds, sep = "|", nrows = 0))
+
+exact_vars <- c(
+  # ID variables
+  'SSUID', 'PNUM', 'MONTHCODE', 'ERESIDENCEID', 'ERELRPE', 'SPANEL', 'SWAVE',
+  'SHHADID', 'THHLDSTATUS', 'RIN_UNIV',
+
+  # Base weight
+  'WPFINWGT',
+
+  # State of residence
+  'TEHC_ST', 'TST_INTV',
+
+  # Demographics
+  'ESEX', 'TAGE', 'TAGE_EHC', 'ERACE', 'EORIGIN', 'EEDUC',
+  'ECITIZEN', 'ENATIVITY', 'EIMM_STAT',
+  'EDISABL', 'RDIS', 'RDIS_ALT',
+
+  # Household structure
+  'TLIVQTR', 'ETENURE', 'EMS',
+
+  # Income
+  'TPTOTINC', 'TPEARN', 'TFTOTINC',
+  'TUNEMP_AMT', 'TSSI_AMT', 'TSSRX', 'TSSXAMT', 'TTANF_AMT',
+
+  # Deductions
+  'TAMOUNTPAID', 'TPAYWK', 'TRENTMORT', 'TUTILS', 'THVAL_RMU',
+  'TCHCARE_AMT', 'TMDPAY',
+
+  # Assets (individual-level; shared assets divided equally)
+  'TVAL_AST', 'TVAL_BANK', 'TVAL_BOND', 'TVAL_BUS', 'TVAL_ESAV',
+  'TVAL_HOME', 'TVAL_RENT', 'TVAL_RE', 'TVAL_RET',
+  'TVAL_STMF', 'TVAL_VEH', 'TVAL_OTH',
+
+  # Program participation
+  'RFSCOV', 'RSNAP_MNYN', 'RTANF_MNYN', 'RSSI_MNYN', 'RWICYN',
+
+  # ABAWD work requirement variables
+  'TMWKHRS', 'EWELACTV2_1', 'EWELACTV2_2', 'EWELACTV2_3', 'EWELACTV4'
+)
+
+patterns <- c(
+  "^RREL", "^ET2REL", "^SNAP", "^TEHC",
+  "^EOWN", "^EJSOWN", "^EJOOWN", "^EOOWN",
+  "^TJS", "^TJO", "^VAL", "^EVEH", "^TVEH"
+)
+
+pattern_vars <- unique(unlist(lapply(patterns, function(p) grep(p, all_cols, value = TRUE))))
+keep_vars    <- unique(c(exact_vars, pattern_vars))
+keep_vars    <- keep_vars[keep_vars %in% all_cols]
+
+pu <- fread(ds, sep = "|", select = keep_vars)
+names(pu) <- toupper(names(pu))
+
+dw <- "data/rw2019.csv"
+rw <- fread(dw, sep = "|")
+names(rw) <- toupper(names(rw))
+
+sipp2019 <- left_join(pu, rw, by = c("SSUID", "PNUM", "MONTHCODE"))
+```
+
+## Filter to July 2019
+
+```{r}
+sipp_0719 <- sipp2019 |>
+  filter(RIN_UNIV == 1 & MONTHCODE == 7) |>
+  mutate(SSUID = as.character(SSUID))
+```
+
+## FPL and Deduction Limits
+
+```{r}
+# 2019 monthly FPL (contiguous 48 states amd DC)
+# https://aspe.hhs.gov/topics/poverty-economic-mobility/poverty-guidelines
+fpl_monthly    <- c(1041, 1410, 1778, 2146, 2515, 2883, 3251, 3620)
+fpl_additional <- 369
+
+# 2019 standard deductions by household size (caps at 6)
+# https://cvlas.org/wp-content/uploads/2022/08/supp-nutrition-assist-prog-SNAP-2019.pdf
+std_ded_tbl <- c(167, 167, 167, 178, 208, 238)
+
+# Excess shelter deduction cap for non-elderly/disabled households
+shelter_cap <- 552
+
+get_fpl <- function(n){
+  fpl_monthly[pmin(n, 8)] + pmax(n - 8, 0) * fpl_additional
+}
+get_std_ded <- function(n){
+  std_ded_tbl[pmin(n, 6)]
+}
+```
+
+## Aggregate to Household-Level SNAP Filing Units
+
+SNAP filing units are people who live and purchase food together. Given that SIPP doesn't account for people who consume food together, we use SSUID to account for the pseudo-economic unit. 
+
+```{r}
+# Aggregation
+hh_sipp <- sipp_0719 |>
+  group_by(SSUID) |>
+  summarize(
+    hh_size = n(),
+    # Flags for exemptions
+    has_elderly = any(TAGE >= 60, na.rm = TRUE),
+    has_disabled = any(RDIS == 1, na.rm = TRUE),
+    has_ssi = any(RSSI_MNYN == 1, na.rm = TRUE),
+    has_tanf = any(RTANF_MNYN == 1, na.rm = TRUE),
+    # Income
+    hh_gross_inc = sum(TPTOTINC, na.rm = TRUE),
+    hh_earn = sum(TPEARN, na.rm = TRUE),
+    # Deductions
+    child_sup_ded = sum(TAMOUNTPAID, na.rm = TRUE),
+    child_care_ded = first(TPAYWK[!is.na(TPAYWK)], default = 0) * 4,
+    medical_costs = sum(TMDPAY, na.rm = TRUE),
+    # Shelter (December of reference year as proxy)
+    shelter_costs = coalesce(first(na.omit(THVAL_RMU)), 0),
+    # Countable assets — exclude home, retirement, educational savings
+    countable_assets = sum(TVAL_BANK, na.rm = TRUE) + sum(TVAL_BOND, na.rm = TRUE) +
+                       sum(TVAL_BUS,  na.rm = TRUE) + sum(TVAL_STMF, na.rm = TRUE) +
+                       sum(TVAL_RENT, na.rm = TRUE) + sum(TVAL_RE,   na.rm = TRUE) +
+                       sum(TVAL_OTH,  na.rm = TRUE),
+    vehicle_assets = sum(TVAL_VEH, na.rm = TRUE),
+    # Household-level vehicle values for state exclusion rules
+    tveh1_val = first(TVEH1VAL),
+    tveh2_val = first(TVEH2VAL),
+    tveh3_val = first(TVEH3VAL),
+    # ABAWD flags — computed at person level, aggregated to household
+    has_children = any(TAGE < 18, na.rm = TRUE),
+    has_abawd_age = any(TAGE >= 18 & TAGE <= 49 & RDIS != 1, na.rm = TRUE),
+    abawd_meets_work = any(
+      (TAGE >= 18 & TAGE <= 49 & RDIS != 1) & (TMWKHRS >= 20), na.rm = TRUE),
+    has_any_citizen = any(ECITIZEN %in% c(1L, 2L), na.rm = TRUE),
+    state_fips = first(TEHC_ST),
+    weight = first(WPFINWGT),
+    snap_actual = any(RSNAP_MNYN == 1, na.rm = TRUE)
+  ) |>
+  # joining in snap eligibility rules 
+  left_join(snapdb, by = "state_fips")
+```
+
+## Eligibility Function
+
+Set up to allow us to change baslines, modify policies. Unforuntately we need all of these components in the function. 
+
+```{r}
+snap_elig_sim <- function(
+    hh_size, hh_gross_inc, hh_earn,
+    countable_assets, vehicle_assets, tveh1_val,
+    has_elderly, has_disabled, has_ssi, has_tanf,
+    has_children, has_abawd_age, abawd_meets_work,
+    has_any_citizen,
+    shelter_costs, child_sup_ded, child_care_ded, medical_costs,
+    bbce, bbce_inclmt, bbce_asset, bbce_a_amt,
+    bbce_child, bbce_elddisinclmt,
+    vehexclall, vehexclone, work_req,
+    # We can add in more baseline uniform scenarios here to change later
+    override_gross_pct = 1.30,   # federal default: 130% FPL
+    override_net_pct = 1.00,   # federal default: 100% FPL
+    override_asset_lmt = NULL,   #use federal/BBCE limits
+    override_elim_asset = FALSE,  # TRUE = eliminate asset test nationally
+    override_work_req = NULL   # use state-level work_req
+
+    ) 
+{
+  
+  # FPL thresholds
+  fpl <- get_fpl(hh_size)
+  gross_limit <- fpl * override_gross_pct
+  net_limit <- fpl * override_net_pct
+  asset_limit <- if_else(has_elderly | has_disabled, 4500, 3000)
+  if (!is.null(override_asset_lmt)) asset_limit <- rep(override_asset_lmt, length(hh_size))
+
+  # Net income
+  std_ded  <- get_std_ded(hh_size)
+  earn_ded <- hh_earn * 0.20
+  net_pre_shelter <- pmax(hh_gross_inc - std_ded - earn_ded - child_sup_ded - child_care_ded, 0)
+  shelter_excess <- pmax(shelter_costs - 0.50 * net_pre_shelter, 0)
+  shelter_ded <- if_else(has_elderly | has_disabled,
+                         shelter_excess, pmin(shelter_excess, shelter_cap))
+  medical_ded <- if_else(has_elderly | has_disabled, pmax(medical_costs - 35, 0), 0)
+  net_inc <- pmax(net_pre_shelter - shelter_ded - medical_ded, 0)
+
+  # Categorical eligibility
+  cat_elig <- has_ssi | has_tanf
+
+  # BBCE: only applies to childless households if bbce_child == 0
+  bbce_on      <- !is.na(bbce) & bbce == 1
+  bbce_applies <- bbce_on & !(coalesce(bbce_child, 0L) == 1L & !has_children)
+
+  gross_limit_bbce <- if_else(bbce_applies & coalesce(bbce_inclmt, -9L) > 0,
+                               fpl * (bbce_inclmt / 100), gross_limit)
+  gross_limit_eld  <- if_else(bbce_applies & coalesce(bbce_elddisinclmt, -9L) > 0,
+                               fpl * (bbce_elddisinclmt / 100), gross_limit_bbce)
+  gross_limit_eff  <- if_else(has_elderly | has_disabled, gross_limit_eld, gross_limit_bbce)
+
+  asset_test_on   <- !(bbce_applies & !is.na(bbce_asset) & bbce_asset == 1)
+  asset_limit_eff <- case_when(
+    bbce_applies & coalesce(bbce_a_amt, 0) > 0 ~ bbce_a_amt * 1000,
+    TRUE                                        ~ asset_limit
+  )
+  if (override_elim_asset) asset_test_on <- rep(FALSE, length(hh_size))
+
+  # Vehicle countable value
+  vehicle_countable <- case_when(
+    vehexclall == 1 ~ 0,
+    vehexclone == 1 ~ pmax(vehicle_assets - coalesce(tveh1_val, 0), 0),
+    TRUE            ~ vehicle_assets
+  )
+  net_worth_countable <- countable_assets + vehicle_countable
+
+  # Individual tests
+  gross_elig <- hh_gross_inc <= gross_limit_eff
+  net_elig   <- net_inc      <= net_limit
+  asset_elig <- !asset_test_on | cat_elig | (net_worth_countable <= asset_limit_eff)
+
+  # Work requirements
+  eff_work_req <- if (!is.null(override_work_req)) rep(override_work_req, length(hh_size)) else work_req
+  has_abawd    <- has_abawd_age & !has_children & !has_ssi & !has_tanf
+  work_elig    <- eff_work_req == "full_exemption" | !has_abawd | abawd_meets_work
+
+  citizen_elig <- coalesce(has_any_citizen, TRUE) | cat_elig
+
+  # Final eligibility
+  (cat_elig | (gross_elig & net_elig)) & asset_elig & work_elig & citizen_elig
+}
+```
+
+
+## Random Example to determine eligibility
+```{r}
+snap_elig_sim(
+    hh_size = 3, hh_gross_inc = 100, hh_earn = 100,
+    countable_assets = 0, vehicle_assets = 0, tveh1_val = 0,
+    has_elderly = FALSE, has_disabled = FALSE, has_ssi = FALSE, has_tanf = FALSE,
+    has_children = TRUE, has_abawd_age = TRUE, abawd_meets_work = FALSE,
+    has_any_citizen = TRUE,
+    shelter_costs = 100, child_sup_ded = 0, child_care_ded = 0, medical_costs = 0,
+    bbce = -9, bbce_inclmt = -9, bbce_asset = -9, bbce_a_amt = -9,
+    bbce_child = 0, bbce_elddisinclmt = -9,
+    vehexclall = 0, vehexclone = 0, work_req = "no_exemption")
+```
+## Scenario Sample
+
+```{r}
+run_scenario <- function(data, scenario_name, ...) {
+  data |>
+    mutate(
+      snap_eligible = snap_elig_sim(
+        hh_size, hh_gross_inc, hh_earn,
+        countable_assets, vehicle_assets, tveh1_val,
+        has_elderly, has_disabled, has_ssi, has_tanf,
+        has_children, has_abawd_age, abawd_meets_work,
+        has_any_citizen,
+        shelter_costs, child_sup_ded, child_care_ded, medical_costs,
+        bbce, bbce_inclmt, bbce_asset, bbce_a_amt,
+        bbce_child, bbce_elddisinclmt,
+        vehexclall, vehexclone, work_req,
+        ...
+      ),
+      scenario = scenario_name
+    )
+}
+
+summarize_scenario <- function(data) {
+  data |>
+    ungroup() |>
+    summarize(
+      scenario            = first(scenario),
+      n_eligible_weighted = sum(snap_eligible * weight, na.rm = TRUE),
+      n_total_weighted    = sum(weight, na.rm = TRUE),
+      pct_eligible        = round(weighted.mean(snap_eligible, weight, na.rm = TRUE) * 100, 1)
+    )
+}
+```
+
+## Run Scenarios
+
+```{r}
+baseline <- run_scenario(hh_sipp, "Baseline (2019)")
+```
+Scenarios we can run
+```{r}
+scenario1 <- run_scenario(hh_sipp, "Eliminate asset test",
+                   override_elim_asset = TRUE)
+
+scenario2 <- run_scenario(hh_sipp, "Gross limit 200% FPL",
+                   override_gross_pct = 2.00)
+
+scenario3 <- run_scenario(hh_sipp, "Waive ABAWD nationally",
+                   override_work_req = "full_exemption")
+
+
+```
+
+## Results
+
+```{r}
+results <- bind_rows(
+  summarize_scenario(baseline),
+  summarize_scenario(scenario1),
+  summarize_scenario(scenario2),
+  summarize_scenario(scenario3))
+
+results
+```
+
