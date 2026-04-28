@@ -167,7 +167,7 @@ hh_sipp <- sipp_0719 |>
     hh_earn = sum(TPEARN, na.rm = TRUE),
     # Deductions
     child_sup_ded = sum(TAMOUNTPAID, na.rm = TRUE),
-    child_care_ded = sum(TPAYWK * 4, na.rm = TRUE),
+    child_care_ded = first(TPAYWK[!is.na(TPAYWK)], default = 0) * 4,
     medical_costs = sum(TMDPAY, na.rm = TRUE),
     # Shelter (December of reference year as proxy)
     shelter_costs = coalesce(first(na.omit(THVAL_RMU)), 0),
@@ -178,9 +178,9 @@ hh_sipp <- sipp_0719 |>
                        sum(TVAL_OTH,  na.rm = TRUE),
     vehicle_assets = sum(TVAL_VEH, na.rm = TRUE),
     # Household-level vehicle values for state exclusion rules
-    tveh1_val = first(TVEH1VAL, na.rm = TRUE),
-    tveh2_val = first(TVEH2VAL, na.rm = TRUE),
-    tveh3_val = first(TVEH3VAL, na.rm = TRUE),
+    tveh1_val = first(TVEH1VAL),
+    tveh2_val = first(TVEH2VAL),
+    tveh3_val = first(TVEH3VAL),
     # ABAWD flags — computed at person level, aggregated to household
     has_children = any(TAGE < 18, na.rm = TRUE),
     has_abawd_age = any(TAGE >= 18 & TAGE <= 49 & RDIS != 1, na.rm = TRUE),
@@ -286,14 +286,14 @@ snap_elig_sim <- function(
 ## Random Example to determine eligibility
 ```{r}
 snap_elig_sim(
-    hh_size = 3, hh_gross_inc = 10000, hh_earn = 10000,
-    countable_assets = 100000, vehicle_assets = 20000, tveh1_val = 20000,
+    hh_size = 3, hh_gross_inc = 100, hh_earn = 100,
+    countable_assets = 0, vehicle_assets = 0, tveh1_val = 0,
     has_elderly = FALSE, has_disabled = FALSE, has_ssi = FALSE, has_tanf = FALSE,
-    has_children = FALSE, has_abawd_age = TRUE, abawd_meets_work = TRUE,
+    has_children = TRUE, has_abawd_age = TRUE, abawd_meets_work = FALSE,
     has_any_citizen = TRUE,
-    shelter_costs = 10000, child_sup_ded = 0, child_care_ded = 0, medical_costs = 0,
+    shelter_costs = 100, child_sup_ded = 0, child_care_ded = 0, medical_costs = 0,
     bbce = -9, bbce_inclmt = -9, bbce_asset = -9, bbce_a_amt = -9,
-    bbce_child = 0L, bbce_elddisinclmt = -9L,
+    bbce_child = 0, bbce_elddisinclmt = -9,
     vehexclall = 0, vehexclone = 0, work_req = "no_exemption")
 ```
 ## Scenario Sample
@@ -318,10 +318,10 @@ run_scenario <- function(data, scenario_name, ...) {
     )
 }
 
-summarise_scenario <- function(data) {
+summarize_scenario <- function(data) {
   data |>
     ungroup() |>
-    summarise(
+    summarize(
       scenario            = first(scenario),
       n_eligible_weighted = sum(snap_eligible * weight, na.rm = TRUE),
       n_total_weighted    = sum(weight, na.rm = TRUE),
@@ -334,17 +334,22 @@ summarise_scenario <- function(data) {
 
 ```{r}
 baseline <- run_scenario(hh_sipp, "Baseline (2019)")
-
-s1 <- run_scenario(hh_sipp, "Eliminate asset test",
+```
+Scenarios we can run
+```{r}
+scenario1 <- run_scenario(hh_sipp, "Eliminate asset test",
                    override_elim_asset = TRUE)
 
-s2 <- run_scenario(hh_sipp, "Gross limit 200% FPL",
+scenario2 <- run_scenario(hh_sipp, "Gross limit 200% FPL",
                    override_gross_pct = 2.00)
 
-s3 <- run_scenario(hh_sipp, "Waive ABAWD nationally",
+scenario3 <- run_scenario(hh_sipp, "Waive ABAWD nationally",
                    override_work_req = "full_exemption")
 
-s4 <- run_scenario(hh_sipp, "Higher asset limits ($6k/$9k)",
+
+```
+```{r}
+scenario4 <- run_scenario(hh_sipp, "Higher asset limits ($6k/$9k)",
                    override_asset_lmt = if_else(hh_sipp$has_elderly | hh_sipp$has_disabled, 9000, 6000))
 ```
 
@@ -352,12 +357,10 @@ s4 <- run_scenario(hh_sipp, "Higher asset limits ($6k/$9k)",
 
 ```{r}
 results <- bind_rows(
-  summarise_scenario(baseline),
-  summarise_scenario(s1),
-  summarise_scenario(s2),
-  summarise_scenario(s3),
-  summarise_scenario(s4)
-)
+  summarize_scenario(baseline),
+  summarize_scenario(scenario1),
+  summarize_scenario(scenario2),
+  summarize_scenario(scenario3))
 
 results
 ```
