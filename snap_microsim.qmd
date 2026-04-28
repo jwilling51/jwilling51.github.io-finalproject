@@ -1,9 +1,14 @@
 ---
 title: "SNAP Eligibility Microsimulation"
-format: html
+format:
+  html:
+    embed-resources: true
 editor:
   markdown:
     wrap: 72
+execute:
+  cache: true
+  cache.lazy: false
 ---
 
 ## Overview
@@ -16,6 +21,7 @@ scenarios.
 ## Libraries
 
 ```{r}
+#| cache: false
 library(tidyverse)
 library(readxl)
 library(data.table)
@@ -49,6 +55,7 @@ snapdb <- snapdb |>
 ## Load SIPP 2019
 
 ```{r}
+#| cache: false
 ds <- "data/pu2019.csv"
 
 all_cols <- names(fread(ds, sep = "|", nrows = 0))
@@ -121,10 +128,6 @@ sipp_0719 <- sipp2019 |>
 ```
 
 ## FPL and Deduction Limits
-```{r}
-## Inspecting missingness
-skim(sipp_0719)
-```
 
 ```{r}
 # 2019 monthly FPL (contiguous 48 states amd DC)
@@ -347,10 +350,6 @@ scenario3 <- run_scenario(hh_sipp, "Waive ABAWD nationally",
                    override_work_req = "full_exemption")
 
 
-```
-```{r}
-scenario4 <- run_scenario(hh_sipp, "Higher asset limits ($6k/$9k)",
-                   override_asset_lmt = if_else(hh_sipp$has_elderly | hh_sipp$has_disabled, 9000, 6000))
 ```
 
 ## Results
