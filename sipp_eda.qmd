@@ -3,28 +3,32 @@ title: "SIPP EDA"
 author: "Sarah Krause"
 format: html
 editor: visual
+embed-resources: true
 ---
 
 # Read in the SIPP data
 
+For this section of the code, I have just copied from the microsim file to read in all the files and aggregate the SIPP vars to the household level.
+
 ```{r}
 #Load the "data.table", "dplyer", and "bit64" libraries
-install.packages("data.table")
 library(data.table)
-install.packages("bit64")
 library(bit64)
-install.packages("dplyr")
 library(dplyr)
-install.packages("haven")
 library(haven)
 library(ggplot2)
+library(tidyr)
+library(readxl)
 ```
 
 ```{r}
+ds <- c("data/pu2019.csv")
+
 # Step 1: Read all named columns plus pattern-matched ones
 all_cols <- names(fread(ds, sep = "|", nrows = 0))
+```
 
-# Step 2: Define exact variables
+```{r}
 exact_vars <- c(
   # ID variables
   'SSUID', 'PNUM', 'MONTHCODE', 'ERESIDENCEID', 'ERELRPE', 'SPANEL', 'SWAVE',
@@ -36,76 +40,307 @@ exact_vars <- c(
   # State of residence
   'TEHC_ST', 'TST_INTV',
 
-  # Income
-  'TPTOTINC', 'TFTOTINC', 'THNETWORTH', 'TPEARN',
-  'TUNEMP_AMT', 'TSSI_AMT', 'TSSRX', 'TSSXAMT',
-  'TTANF_AMT', 'TVET_AMT', 'TWIC_AMT', 'TCSPP_AMT', 'TCSPR_AMT',
-
-  # Deductions
-  'TCHCARE_AMT', 'TMOOP',
-
-  # Household composition & filing unit
-  'TLIVQTR', 'ETENURE', 'EMS', 'EMS_EHC', 'EENROLL', 'ESCHOOL',
-
   # Demographics
   'ESEX', 'TAGE', 'TAGE_EHC', 'ERACE', 'EORIGIN', 'EEDUC',
+  'ECITIZEN', 'ENATIVITY', 'EIMM_STAT',
+  'EDISABL', 'RDIS', 'RDIS_ALT',
 
-  # Citizenship & immigration
-  'ENATIVITY', 'ECITIZEN', 'EIMM_STAT', 'TYEAR_ENTRY',
+  # Household structure
+  'TLIVQTR', 'ETENURE', 'EMS',
 
-  # Categorical eligibility & disability
-  'ESSIV', 'ETANF', 'RDIS', 'RDIS_ALT', 'EWIC',
+  # Income
+  'TPTOTINC', 'TPEARN', 'TFTOTINC',
+  'TUNEMP_AMT', 'TSSI_AMT', 'TSSRX', 'TSSXAMT', 'TTANF_AMT',
 
-  # Assets
-  'ERET_LUMPSUM', 'TDRAW_AMT'
+  # Deductions
+  'TAMOUNTPAID', 'TPAYWK', 'TRENTMORT', 'TUTILS', 'THVAL_RMU',
+  'TCHCARE_AMT', 'TMDPAY',
+
+  # Assets (individual-level; shared assets divided equally)
+  'TVAL_AST', 'TVAL_BANK', 'TVAL_BOND', 'TVAL_BUS', 'TVAL_ESAV',
+  'TVAL_HOME', 'TVAL_RENT', 'TVAL_RE', 'TVAL_RET',
+  'TVAL_STMF', 'TVAL_VEH', 'TVAL_OTH',
+
+  # Program participation
+  'RFSCOV', 'RSNAP_MNYN', 'RTANF_MNYN', 'RSSI_MNYN', 'RWICYN',
+
+  # ABAWD work requirement variables
+  'TMWKHRS', 'EWELACTV2_1', 'EWELACTV2_2', 'EWELACTV2_3', 'EWELACTV4'
 )
 
-# Step 3: Define patterns for prefix/suffix matched variables
 patterns <- c(
-  "^SNAP", "^TEHC", "^TCHCARE", "^TMED", "^EDIS", "^EMED",
+  "^RREL", "^ET2REL", "^SNAP", "^TEHC",
   "^EOWN", "^EJSOWN", "^EJOOWN", "^EOOWN",
-  "^TJS", "^TJO", "^VAL", "^TO",
-  "^EVEH", "^TVEH"
+  "^TJS", "^TJO", "^VAL", "^EVEH", "^TVEH"
 )
 
 pattern_vars <- unique(unlist(lapply(patterns, function(p) grep(p, all_cols, value = TRUE))))
-
-# Step 4: Combine, keep only cols that exist, and read
-keep_vars <- unique(c(exact_vars, pattern_vars))
-keep_vars <- keep_vars[keep_vars %in% all_cols]
+keep_vars    <- unique(c(exact_vars, pattern_vars))
+keep_vars    <- keep_vars[keep_vars %in% all_cols]
 
 pu <- fread(ds, sep = "|", select = keep_vars)
+names(pu) <- toupper(names(pu))
+
+dw <- "data/rw2019.csv"
+rw <- fread(dw, sep = "|")
+names(rw) <- toupper(names(rw))
+
+sipp2019 <- left_join(pu, rw, by = c("SSUID", "PNUM", "MONTHCODE"))
 ```
 
 ```{r}
-# Make sure all the column names are upper-case 
-names(pu) <- toupper(names(pu))
+# Filter to July 2019
+sipp_0719 <- sipp2019 |>
+  filter(RIN_UNIV == 1 & MONTHCODE == 7) |>
+  mutate(SSUID = as.character(SSUID))
 
 # Preview the data 
-head(pu, 20)
+head(sipp_0719, 20)
 
+```
+
+```{r}
+snapdb <- read_xlsx("data/SNAPPolicyDatabase.xlsx", sheet = "SNAP Policy Database") |>
+  filter(yearmonth == 201907) |>
+  select(starts_with("state"), starts_with("bbce"), starts_with("veh"))
+
+# Work requirement tiers based on FY2019 Q4 ABAWD waiver status
+state_exempt <- c("Alaska", "District of Columbia", "Louisiana", "New Mexico")
+
+state_nonexempt <- c("Alabama", "Arkansas", "Delaware", "Florida", "Indiana",
+                     "Iowa", "Kansas", "Maine", "Mississippi", "Missouri",
+                     "Nebraska", "North Carolina", "Oklahoma", "South Carolina",
+                     "Texas", "Wisconsin", "Wyoming")
+
+snapdb <- snapdb |>
+  mutate(work_req = case_when(
+    statename %in% state_exempt ~ "full_exemption",
+    statename %in% state_nonexempt ~ "no_exemption",
+    TRUE ~ "partial_exemption"))
+```
+
+```{r}
+# Aggregate to household level
+hh_sipp <- sipp_0719 |>
+  group_by(SSUID) |>
+  summarize(
+    hh_size = n(),
+    # Flags for exemptions
+    has_elderly = any(TAGE >= 60, na.rm = TRUE),
+    has_disabled = any(RDIS == 1, na.rm = TRUE),
+    has_ssi = any(RSSI_MNYN == 1, na.rm = TRUE),
+    has_tanf = any(RTANF_MNYN == 1, na.rm = TRUE),
+    # Income
+    hh_gross_inc = sum(TPTOTINC, na.rm = TRUE),
+    hh_earn = sum(TPEARN, na.rm = TRUE),
+    # Deductions
+    child_sup_ded = sum(TAMOUNTPAID, na.rm = TRUE),
+    child_care_ded = first(TPAYWK[!is.na(TPAYWK)], default = 0) * 4,
+    medical_costs = sum(TMDPAY, na.rm = TRUE),
+    # Shelter (December of reference year as proxy)
+    shelter_costs = coalesce(first(na.omit(THVAL_RMU)), 0),
+    # Countable assets — exclude home, retirement, educational savings
+    countable_assets = sum(TVAL_BANK, na.rm = TRUE) + sum(TVAL_BOND, na.rm = TRUE) +
+                       sum(TVAL_BUS,  na.rm = TRUE) + sum(TVAL_STMF, na.rm = TRUE) +
+                       sum(TVAL_RENT, na.rm = TRUE) + sum(TVAL_RE,   na.rm = TRUE) +
+                       sum(TVAL_OTH,  na.rm = TRUE),
+    vehicle_assets = sum(TVAL_VEH, na.rm = TRUE),
+    # Household-level vehicle values for state exclusion rules
+    tveh1_val = first(TVEH1VAL),
+    tveh2_val = first(TVEH2VAL),
+    tveh3_val = first(TVEH3VAL),
+    # ABAWD flags — computed at person level, aggregated to household
+    has_children = any(TAGE < 18, na.rm = TRUE),
+    has_abawd_age = any(TAGE >= 18 & TAGE <= 49 & RDIS != 1, na.rm = TRUE),
+    abawd_meets_work = any(
+      (TAGE >= 18 & TAGE <= 49 & RDIS != 1) & (TMWKHRS >= 20), na.rm = TRUE),
+    has_any_citizen = any(ECITIZEN %in% c(1L, 2L), na.rm = TRUE),
+    state_fips = first(TEHC_ST),
+    weight = first(WPFINWGT),
+    snap_actual = any(RSNAP_MNYN == 1, na.rm = TRUE)
+  ) |>
+  # joining in snap eligibility rules 
+  left_join(snapdb, by = "state_fips")
 ```
 
 # EDA
 
-```{r}
-# Flag person-months that are in-universe (RIN_UNIV == 1)
-pu_active <- pu[RIN_UNIV == 1]
-nrow(pu_active)
-
-cat("Unique individuals:", pu_active[, uniqueN(paste(SSUID, PNUM))], "\n")
-cat("Unique households:", pu_active[, uniqueN(SSUID)], "\n")
-cat("Months observed:", sort(unique(pu_active$MONTHCODE)), "\n\n")
-```
+First, how many individuals and households are there in SIPP?
 
 ```{r}
-# missingness
-tibble(variable = names(pu_active),
-       pct_missing = colMeans(is.na(pu_active)) * 100) |>
-  arrange(desc(pct_missing))
+# Number of unique individuals & households
+cat("Unique individuals:", sipp_0719[, uniqueN(paste(SSUID, PNUM))], "\n")
+cat("Unique households:", sipp_0719[, uniqueN(SSUID)], "\n")
 ```
 
-# Distribution of personal and family income
+## Individual-level missingness
+
+We are interested in seeing the level of missingness in the variables we will be using for our microsimulation.
+
+```{r}
+microsim_vars <- sipp_0719 |>
+  # Select the variables we use in our microsimulation
+  select(SSUID, SHHADID, ERELRPE, PNUM, TAGE, RDIS, RSSI_MNYN, RTANF_MNYN,
+         TPTOTINC, TPEARN, TAMOUNTPAID, TPAYWK,
+         TMDPAY, THVAL_RMU, starts_with("TVAL"), TVEH1VAL, TVEH2VAL, TVEH3VAL,
+         TMWKHRS, ECITIZEN, TEHC_ST, WPFINWGT, RSNAP_MNYN)
+
+# Skim the variables to get a summary
+library(skimr)
+vars_skimmed <- skimr::skim(microsim_vars) |>
+  arrange(complete_rate)
+
+# Examine the number missing and complete rate for each variable
+vars_skimmed |>
+  select(skim_variable, n_missing, complete_rate) |>
+  print()
+```
+
+TAMOUNTPAID (amount of child support paid), TPAYWK (amount paid for childcare during a typical week), and TVEH3VAL (value of the 3rd vehicle in the household) have over 70% of the variable missing at the individual level. This is not surprising, because we would expect that most families in the SIPP do not pay child support or own 3 vehicles. The high level of missingness for TPAYWK is more surprising.
+
+Perhaps TPAYWK is missing at a high rate because the question is asked to only the reference parent, so the others in the household would have missing values because they are not in universe.
+
+```{r}
+install.packages("naniar")
+library(naniar)
+
+# Visualize =missingness across all variables
+gg_miss_var(microsim_vars)
+```
+
+This is good information to have, but our microsimulation is occurring at the household level. Next we examine missingness of variables for households (how many households are compoltely missing a value for our key variables).
+
+This will help us understand what variables would be candidates for substitution or KNN. For example, missing a lot of child support information is to be expected because not everyone pays child support, but if we're missing asset information at the household level, that might be more of a problem for the precision of our simulation.
+
+## Household-level missingness
+
+First, how many households are missing all values of each variable?
+
+```{r}
+microsim_vars |>
+  group_by(SSUID) |>
+  summarize(across(everything(), ~ all(is.na(.x)))) |>  # TRUE if all members missing
+  summarize(across(-SSUID, sum)) |>                      # count households where TRUE
+  pivot_longer(everything(), names_to = "variable", values_to = "n_hh_missing") |>
+  ggplot(aes(x = reorder(variable, -n_hh_missing), y = n_hh_missing)) +
+  geom_col() +
+  labs(
+    x = "Variable",
+    y = "Number of Households",
+    title = "Households with All Values Missing per Variable"
+  ) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+TAMOUNTPAID (child support paid), TPAYWK (amount paid in child care), TVEH3VAL (value of the 3rd vehicle), TMWKHRS (average number of hours worked per week), TPEARN (sum of earnings), TVEH1VAL (value of the first vehicle) have households with all values missing.
+
+When we aggregate, this will not be a problem because NA's will be treated as 0's. So households that are missing a value for any of these variables will be coded as 0 at the household level. Because of the definitions of these variables, this is an accurate representation. For example, for TPEARN, the universe is individuals who reported having at least one job during the reference month. If they had no job that month, then their earnings from jobs should be coded as 0.
+
+We are interested in how many individuals in a household are missing values for our key variables. Next, we write a custom function to obtain a histogram of individual missingness at the household level, which will help us visualize: for each household, what percent of members are missing for a variable
+
+```{r}
+# Houshold missingness histogram function
+#' Title: For each household, what percent of members are missing for a variable
+#'
+#' @param data = the data to be used
+#' @param var = the variable you want to visualize
+#' @param hh_id = the household id variale to group by
+#'
+#' @returns a histogram with % missing on the x axis and number of households on the y
+#' @export
+#'
+hh_miss_hist <- function(data, var, hh_id) {
+    data |>
+    group_by({{ hh_id }}) |>
+    summarize(pct_missing = mean(is.na({{ var }})) * 100) |>
+    ggplot(aes(x = pct_missing)) +
+    geom_histogram(binwidth = 5) +
+    labs(
+      x = "% Missing",
+      y = "Number of Households",
+      title = glue::glue("Missingness of {deparse(substitute(var))} across Households")
+    )
+}
+
+# Examine the function on the TAMOUNTPAID variable (which we has the highest level of missingness) to make sure the function worked (sanity check)
+hh_miss_hist(data = microsim_vars, var = TAMOUNTPAID, hh_id = SSUID)
+```
+
+The graph shows that \~20,000 households are 100% missing for this variable.
+
+We will use this function to understand individual missingness within households for our key variables.
+
+```{r}
+# Make a list of all the variables in microsim_vars
+var_list <- names(microsim_vars)
+
+# Obtain plots of the missingness of all microsimulation variables
+plots <- sapply(var_list, function(v) {
+  do.call(hh_miss_hist, list(data = microsim_vars, var = as.name(v), hh_id = as.name("SSUID")))
+}, simplify = FALSE)
+
+# Visualize TPAYWK missingness (second highest missingness)
+plots[["TPAYWK"]]
+```
+
+\~19,000 households are 100% missing for this variable.
+
+## Apply the function to all variables
+
+From our earlier analysis of missingness at the indivdual-level, we found that TAGE (age), RTANF_MNYN (received TANF this month), ECITIZEN (is a citizen) are not missing for any individuals in the SIPP. RDIS (individual has a disability) and RSSI_MNYN (received SSI benefits this month) have very low levels of missingness at the individual-level. So, we will exclude these variables from this part of the EDA.
+
+First, we examine the variables that show income and deductions: TPTOTINC (sum of personal monthly earnings for people age 15 and over), TPEARN (sum of earnings from jobs), and TMDPAY (amount paid out of pocket for medical care).
+
+TPTOTINC and TPEARN are used to estimate gross income and earnings, respectively, and TMDPAY is used to estimate deductions for medical costs.
+
+```{r}
+# Income and deduction variables
+incded_vars <- c("TPTOTINC", "TPEARN", "TMDPAY")
+
+wrap_plots(plots[incded_vars])
+```
+
+For TPTOTINC (gross income), most households (over 15,000) are not missing anything, meaning that all individuals in the household reported income. Most households have 0% missing for TMDPAY (medical costs) as well.
+
+Next we examine TPEARN (earnings) more closely:
+
+```{r}
+microsim_vars |>
+  group_by(SSUID) |>
+  summarize(pct_missing = mean(is.na(TPEARN)) * 100) |>
+  count(pct_missing)
+```
+
+Most households have some individuals who have missing values for their earnings from jobs.
+
+Next, we examine the shelter and asset variables:
+
+```{r}
+# Shelter and assets
+shelterasset_vars <- c("TVAL_BANK", "TVAL_BOND", "TVAL_BUS", "TVAL_STMF", "TVAL_RENT",
+                       "TVAL_RE", "TVAL_OTH", "TVAL_VEH")
+
+wrap_plots(plots[shelterasset_vars])
+```
+
+All of these variables are mostly households without any missing values at the individual level.
+
+Next, we examine the variables we use to estimate ABAWD and vehicle assets.
+
+```{r}
+# Vehicles and ABAWD vars
+veh_abawd_vars <- c("TMWKHRS", "TVEH1VAL", "TVEH2VAL", "TVEH3VAL")
+
+wrap_plots(plots[veh_abawd_vars])
+```
+
+TMWKHRS (average number of hours worked per week across all jobs) has the same missingness distribution as TPEARN because they have the same universe description (individuals who had at least one job during the reference month).
+
+For the vehicle variables, they are either 0% missing or 100% missing in a household, which makes sense because each individual in the household would report the same information for their vehicles.
+
+# EDA on entire SIPP
+
+## Distribution of personal and family income
 
 ```{r}
  
@@ -148,7 +383,7 @@ ggplot(pu_active[TFTOTINC >= 0 & TFTOTINC <= p95_fam],
   theme_minimal()
 ```
 
-# Income by state
+## Income by state
 
 ```{r}
 state_income <- pu_active[, .(
@@ -157,10 +392,9 @@ state_income <- pu_active[, .(
   pct_zero_income   = round(100 * weighted.mean(TFTOTINC == 0, WPFINWGT, na.rm = TRUE), 1)
 ), by = TEHC_ST][order(TEHC_ST)]
 state_income
- 
 ```
 
-# Earned vs. Unearned Income
+## Earned vs. Unearned Income
 
 ```{r}
 pu_active[, income_type := fcase(
@@ -187,23 +421,4 @@ ggplot(income_type_summary, aes(x = reorder(income_type, pct), y = pct)) +
   ) +
   theme_minimal()
  
-```
-
-# SNAP Policy Database
-
-```{r}
-library(readxl)
-library(here)
-
-spd <- read_excel(here("data", "SNAPPolicyDatabase.xlsx"),
-                  sheet = "SNAP Policy Database")
-
-
-```
-
-Select september 2019
-
-```{r}
-sept_2010 <- spd |>
-  filter(yearmonth == 201909)
 ```
