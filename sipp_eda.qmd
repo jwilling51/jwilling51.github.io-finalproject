@@ -8,7 +8,7 @@ embed-resources: true
 
 # Read in the SIPP data
 
-For this section of the code, I have just copied from the microsim file to read in all the files and aggregate the SIPP vars to the household level.
+For this section of the code, I have just copied from the snap_microsim file to read in all the files and aggregate the SIPP vars to the household level.
 
 ```{r}
 #Load the "data.table", "dplyer", and "bit64" libraries
@@ -92,10 +92,28 @@ sipp2019 <- left_join(pu, rw, by = c("SSUID", "PNUM", "MONTHCODE"))
 # Filter to July 2019
 sipp_0719 <- sipp2019 |>
   filter(RIN_UNIV == 1 & MONTHCODE == 7) |>
-  mutate(SSUID = as.character(SSUID))
+  mutate(hhid = paste0(as.character(SSUID), as.character(SHHADID))) |>
+  group_by(hhid) |>
+  mutate(snap_split = ERELRPE %in% 16:18, # splitting cases that are roommates/boarders/other non-family into separate SNAP unit
+         split_id = if_else(snap_split, cumsum(snap_split), NA_integer_),
+         snapuid = case_when(!snap_split ~ 1,
+         snap_split ~ split_id + 1)
+) |> ungroup() |>
+  mutate(snap_hhid = paste0(hhid, snapuid))
 
-# Preview the data 
-head(sipp_0719, 20)
+# Brief checks to make sure split went correctly
+sipp_0719 |>
+  group_by(hhid) |>
+  summarise(n_snap_units = n_distinct(snap_hhid)) |>
+  count(n_snap_units)
+
+sipp_0719 |>
+  group_by(hhid) |>
+  filter(n_distinct(snap_hhid) > 1) |>
+  arrange(hhid, snap_hhid) |>
+  select(hhid, ERELRPE, snap_hhid) |>
+  ungroup() |>
+  slice_head(n = 50)
 
 ```
 
@@ -120,9 +138,9 @@ snapdb <- snapdb |>
 ```
 
 ```{r}
-# Aggregate to household level
+# Aggregation
 hh_sipp <- sipp_0719 |>
-  group_by(SSUID) |>
+  group_by(snap_hhid) |>
   summarize(
     hh_size = n(),
     # Flags for exemptions
@@ -154,7 +172,7 @@ hh_sipp <- sipp_0719 |>
     has_abawd_age = any(TAGE >= 18 & TAGE <= 49 & RDIS != 1, na.rm = TRUE),
     abawd_meets_work = any(
       (TAGE >= 18 & TAGE <= 49 & RDIS != 1) & (TMWKHRS >= 20), na.rm = TRUE),
-    has_any_citizen = any(ECITIZEN %in% c(1L, 2L), na.rm = TRUE),
+    has_any_citizen = any(ECITIZEN %in% c(1L, 2L), na.rm = TRUE), # confirm this
     state_fips = first(TEHC_ST),
     weight = first(WPFINWGT),
     snap_actual = any(RSNAP_MNYN == 1, na.rm = TRUE)
@@ -168,9 +186,15 @@ hh_sipp <- sipp_0719 |>
 First, how many individuals and households are there in SIPP?
 
 ```{r}
-# Number of unique individuals & households
-cat("Unique individuals:", sipp_0719[, uniqueN(paste(SSUID, PNUM))], "\n")
-cat("Unique households:", sipp_0719[, uniqueN(SSUID)], "\n")
+# Number of unique individuals
+sipp_0719 |>
+  distinct(paste(SSUID, PNUM)) |>
+  count()
+
+# Number of unique households
+sipp_0719 |>
+  distinct(snap_hhid) |>
+  count()
 ```
 
 ## Individual-level missingness
@@ -180,7 +204,7 @@ We are interested in seeing the level of missingness in the variables we will be
 ```{r}
 microsim_vars <- sipp_0719 |>
   # Select the variables we use in our microsimulation
-  select(SSUID, SHHADID, ERELRPE, PNUM, TAGE, RDIS, RSSI_MNYN, RTANF_MNYN,
+  select(snap_hhid, ERELRPE, PNUM, TAGE, RDIS, RSSI_MNYN, RTANF_MNYN,
          TPTOTINC, TPEARN, TAMOUNTPAID, TPAYWK,
          TMDPAY, THVAL_RMU, starts_with("TVAL"), TVEH1VAL, TVEH2VAL, TVEH3VAL,
          TMWKHRS, ECITIZEN, TEHC_ST, WPFINWGT, RSNAP_MNYN)
@@ -201,7 +225,6 @@ TAMOUNTPAID (amount of child support paid), TPAYWK (amount paid for childcare du
 Perhaps TPAYWK is missing at a high rate because the question is asked to only the reference parent, so the others in the household would have missing values because they are not in universe.
 
 ```{r}
-install.packages("naniar")
 library(naniar)
 
 # Visualize =missingness across all variables
@@ -218,9 +241,9 @@ First, how many households are missing all values of each variable?
 
 ```{r}
 microsim_vars |>
-  group_by(SSUID) |>
+  group_by(snap_hhid) |>
   summarize(across(everything(), ~ all(is.na(.x)))) |>  # TRUE if all members missing
-  summarize(across(-SSUID, sum)) |>                      # count households where TRUE
+  summarize(across(-snap_hhid, sum)) |>                      # count households where TRUE
   pivot_longer(everything(), names_to = "variable", values_to = "n_hh_missing") |>
   ggplot(aes(x = reorder(variable, -n_hh_missing), y = n_hh_missing)) +
   geom_col() +
@@ -263,7 +286,7 @@ hh_miss_hist <- function(data, var, hh_id) {
 }
 
 # Examine the function on the TAMOUNTPAID variable (which we has the highest level of missingness) to make sure the function worked (sanity check)
-hh_miss_hist(data = microsim_vars, var = TAMOUNTPAID, hh_id = SSUID)
+hh_miss_hist(data = microsim_vars, var = TAMOUNTPAID, hh_id = snap_hhid)
 ```
 
 The graph shows that \~20,000 households are 100% missing for this variable.
@@ -276,10 +299,11 @@ var_list <- names(microsim_vars)
 
 # Obtain plots of the missingness of all microsimulation variables
 plots <- sapply(var_list, function(v) {
-  do.call(hh_miss_hist, list(data = microsim_vars, var = as.name(v), hh_id = as.name("SSUID")))
+  do.call(hh_miss_hist, list(data = microsim_vars, var = as.name(v), hh_id = as.name("snap_hhid")))
 }, simplify = FALSE)
 
 # Visualize TPAYWK missingness (second highest missingness)
+library(patchwork)
 plots[["TPAYWK"]]
 ```
 
@@ -306,7 +330,7 @@ Next we examine TPEARN (earnings) more closely:
 
 ```{r}
 microsim_vars |>
-  group_by(SSUID) |>
+  group_by(snap_hhid) |>
   summarize(pct_missing = mean(is.na(TPEARN)) * 100) |>
   count(pct_missing)
 ```
@@ -337,88 +361,3 @@ wrap_plots(plots[veh_abawd_vars])
 TMWKHRS (average number of hours worked per week across all jobs) has the same missingness distribution as TPEARN because they have the same universe description (individuals who had at least one job during the reference month).
 
 For the vehicle variables, they are either 0% missing or 100% missing in a household, which makes sense because each individual in the household would report the same information for their vehicles.
-
-# EDA on entire SIPP
-
-## Distribution of personal and family income
-
-```{r}
- 
-pu_active[, .(
-  N        = .N,
-  N_zero   = sum(TPTOTINC == 0, na.rm = TRUE),
-  N_neg    = sum(TPTOTINC < 0,  na.rm = TRUE),
-  mean     = round(weighted.mean(TPTOTINC, WPFINWGT, na.rm = TRUE), 2),
-  median   = round(median(TPTOTINC, na.rm = TRUE), 2),
-  p25      = round(quantile(TPTOTINC, 0.25, na.rm = TRUE), 2),
-  p75      = round(quantile(TPTOTINC, 0.75, na.rm = TRUE), 2),
-  p95      = round(quantile(TPTOTINC, 0.95, na.rm = TRUE), 2),
-  max      = max(TPTOTINC, na.rm = TRUE)
-)]
-
-pu_active[, .(
-  N        = .N,
-  N_zero   = sum(TFTOTINC == 0, na.rm = TRUE),
-  N_neg    = sum(TFTOTINC < 0,  na.rm = TRUE),
-  mean     = round(weighted.mean(TFTOTINC, WPFINWGT, na.rm = TRUE), 2),
-  median   = round(median(TFTOTINC, na.rm = TRUE), 2),
-  p25      = round(quantile(TFTOTINC, 0.25, na.rm = TRUE), 2),
-  p75      = round(quantile(TFTOTINC, 0.75, na.rm = TRUE), 2),
-  p95      = round(quantile(TFTOTINC, 0.95, na.rm = TRUE), 2),
-  max      = max(TFTOTINC, na.rm = TRUE)
-)]
- 
-p95_fam <- quantile(pu_active$TFTOTINC, 0.95, na.rm = TRUE)
- 
-ggplot(pu_active[TFTOTINC >= 0 & TFTOTINC <= p95_fam],
-       aes(x = TFTOTINC, weight = WPFINWGT)) +
-  geom_histogram(bins = 60, fill = "#2c7bb6", color = "white", linewidth = 0.2) +
-  scale_x_continuous(labels = scales::dollar_format(prefix = "$")) +
-  labs(
-    title    = "Distribution of Monthly Family Income (TFTOTINC)",
-    subtitle = "Weighted; capped at 95th percentile; in-universe person-months",
-    x        = "Monthly Family Income ($)",
-    y        = "Weighted Count"
-  ) +
-  theme_minimal()
-```
-
-## Income by state
-
-```{r}
-state_income <- pu_active[, .(
-  mean_fam_income   = round(weighted.mean(TFTOTINC, WPFINWGT, na.rm = TRUE), 0),
-  median_fam_income = round(median(TFTOTINC, na.rm = TRUE), 0),
-  pct_zero_income   = round(100 * weighted.mean(TFTOTINC == 0, WPFINWGT, na.rm = TRUE), 1)
-), by = TEHC_ST][order(TEHC_ST)]
-state_income
-```
-
-## Earned vs. Unearned Income
-
-```{r}
-pu_active[, income_type := fcase(
-  TPEARN > 0 & (TPTOTINC - TPEARN) <= 0, "Earned only",
-  TPEARN <= 0 & (TPTOTINC - TPEARN) > 0, "Unearned only",
-  TPEARN > 0 & (TPTOTINC - TPEARN) > 0,  "Both",
-  default = "No income"
-)]
- 
-income_type_summary <- pu_active[, .(
-  weighted_n = sum(WPFINWGT),
-  pct        = round(100 * sum(WPFINWGT) / sum(pu_active$WPFINWGT), 1)
-), by = income_type][order(-pct)]
-income_type_summary
- 
-ggplot(income_type_summary, aes(x = reorder(income_type, pct), y = pct)) +
-  geom_col(fill = "#756bb1") +
-  coord_flip() +
-  labs(
-    title    = "Income Composition of Person-Months",
-    subtitle = "Weighted; in-universe person-months",
-    x        = NULL,
-    y        = "% of Person-Months"
-  ) +
-  theme_minimal()
- 
-```
