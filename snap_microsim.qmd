@@ -397,7 +397,7 @@ results <- bind_rows(
   summarize_scenario(work_waive),
   summarize_scenario(work_enforce),
   summarize_scenario(work_30hrs),
-  summarize_scenario(work_dep6),
+  summarize_scenario(work_dep5),
   summarize_scenario(work_age65),
 ) |>
   mutate(
