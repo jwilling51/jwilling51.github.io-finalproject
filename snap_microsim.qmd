@@ -121,7 +121,13 @@ sipp2019 <- left_join(pu, rw, by = c("SSUID", "PNUM", "MONTHCODE"))
 ```
 
 ## Filter to July 2019 and generate new SNAP unit ID
-Households are uniquely identified by SSUID and SHHADID, but some households may contain multiple SNAP units, defined as people who live and purchase food together. The SIPP does not directly ask about this, but we approximate it based on household relationships. We assume that family members and partners living together are part of the same SNAP unit, while roommates/boarders/other non-family members are not.
+
+Households are uniquely identified by SSUID and SHHADID, but some
+households may contain multiple SNAP units, defined as people who live
+and purchase food together. The SIPP does not directly ask about this,
+but we approximate it based on household relationships. We assume that
+family members and partners living together are part of the same SNAP
+unit, while roommates/boarders/other non-family members are not.
 
 ```{r}
 sipp_0719 <- sipp2019 |>
@@ -184,6 +190,17 @@ SSUID to account for the pseudo-economic unit.
 income
 information.](https://www.aeaweb.org/articles?id=10.1257/jep.29.4.199)
 
+Since we are constructing our own SNAP households based on SNAP
+methodology (based on those who share food), we use the SIPP User
+Guide's recommendation to create household weights by simply taking a
+reference person's weight to represent the snap household. More
+information on this methodology can be found in [Section 7.3.3 of the
+user
+guide.](https://www2.census.gov/programs-surveys/sipp/tech-documentation/methodology/2024_SIPP_Users_Guide.pdf)
+
+Citation: U.S. Census Bureau. (2025). *2024 Survey of Income and Program
+Participation Users' Guide* (July 2025). Section 7.3.3, p. 161.
+
 ```{r}
 # Aggregation
 hh_sipp <- sipp_0719 |>
@@ -208,7 +225,7 @@ hh_sipp <- sipp_0719 |>
                        sum(TVAL_BUS,  na.rm = TRUE) + sum(TVAL_STMF, na.rm = TRUE) +
                        sum(TVAL_RENT, na.rm = TRUE) + sum(TVAL_RE,   na.rm = TRUE) +
                        sum(TVAL_OTH,  na.rm = TRUE),
-    vehicle_assets = sum(TVAL_VEH, na.rm = TRUE) - 4650,
+    vehicle_assets = sum(TVAL_VEH, na.rm = TRUE),
     tveh1_val = first(TVEH1VAL),
     tveh2_val = first(TVEH2VAL),
     # ABAWD flags
@@ -226,7 +243,7 @@ hh_sipp <- sipp_0719 |>
                        (is.na(RDIS) | RDIS != 1)]), na.rm = TRUE),
     has_cit_or_elig_noncit = any(ECITIZEN == 1 | (TIMSTAT == 1 & TYRENTRY <= 2014), na.rm = TRUE), 
     state_fips = first(TEHC_ST),
-    weight = sum(WPFINWGT),
+    weight = first(WPFINWGT[ERELRPE == min(ERELRPE)]),
     snap_actual = any(RSNAP_MNYN == 1, na.rm = TRUE)
   )
 ```
@@ -323,7 +340,6 @@ snap_elig_sim <- function(df,
 })}
 
 ```
-
 
 ## Scenario Functions
 
@@ -480,7 +496,7 @@ state_results <- bind_rows(baseline_state, twohundred_state,
          pct_change = round(100 * change_from_baseline / n_eligible_weighted[scenario == "Baseline"],
                             1)) |>
   ungroup() |>
-  arrange(state_fips, scenario)
+  arrange(state_fips)
 
 state_results
 ```
