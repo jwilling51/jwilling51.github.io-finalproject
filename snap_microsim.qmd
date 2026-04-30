@@ -119,7 +119,8 @@ names(rw) <- toupper(names(rw))
 sipp2019 <- left_join(pu, rw, by = c("SSUID", "PNUM", "MONTHCODE"))
 ```
 
-## Filter to July 2019 and generate 
+## Filter to July 2019 and generate new SNAP unit ID
+Households are uniquely identified by SSUID and SHHADID, but some households may contain multiple SNAP units, defined as people who live and purchase food together. The SIPP does not directly ask about this, but we approximate it based on household relationships. We assume that family members and partners living together are part of the same SNAP unit, while roommates/boarders/other non-family members are not.
 
 ```{r}
 sipp_0719 <- sipp2019 |>
@@ -174,8 +175,6 @@ get_std_ded <- function(n){
 
 ## Aggregate to Household-Level SNAP Filing Units
 
-SNAP filing units are people who live and purchase food together. Given that SIPP doesn't account for people who consume food together, we use SSUID to account for the pseudo-economic unit. 
-
 ```{r}
 # Aggregation
 hh_sipp <- sipp_0719 |>
@@ -218,6 +217,7 @@ hh_sipp <- sipp_0719 |>
   ) |>
   # joining in snap eligibility rules 
   left_join(snapdb, by = "state_fips")
+
 ```
 
 ## Eligibility Function
