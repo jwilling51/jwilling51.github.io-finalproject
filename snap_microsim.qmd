@@ -30,7 +30,8 @@ library(skimr)
 ```
 
 ## Load SNAP Policy Database
-This file contains state by state information on 
+
+This file contains state by state information on
 
 ```{r}
 snapdb <- read_xlsx("data/SNAPPolicyDatabase.xlsx", sheet = "SNAP Policy Database") |>
@@ -73,7 +74,7 @@ exact_vars <- c(
 
   # Demographics
   'ESEX', 'TAGE', 'TAGE_EHC', 'ERACE', 'EORIGIN', 'EEDUC',
-  'ECITIZEN', 'ENATIVITY', 'EIMM_STAT',
+  'ECITIZEN', 'ENATIVITY', 'EIMM_STAT', 'TIMSTAT', 'TYRENTRY',
   'EDISABL', 'RDIS', 'RDIS_ALT',
 
   # Household structure
@@ -154,7 +155,7 @@ sipp_0719 |>
 
 ```{r}
 # 2019 monthly FPL (contiguous 48 states and DC)
-# https://aspe.hhs.gov/topics/poverty-economic-mobility/poverty-guidelines
+# https://aspe.hhs.gov/topics/poverty-economic-mobility/poverty-guidelines/prior-hhs-poverty-guidelines-federal-register-references/2019-poverty-guidelines 
 fpl_monthly    <- c(1041, 1410, 1778, 2146, 2515, 2883, 3251, 3620)
 fpl_additional <- 369
 
@@ -175,203 +176,211 @@ get_std_ded <- function(n){
 
 ## Aggregate to Household-Level SNAP Filing Units
 
+[It's important to note the SIPP is very well known for undercounting
+income
+information.](https://www.aeaweb.org/articles?id=10.1257/jep.29.4.199)
+
 ```{r}
 # Aggregation
 hh_sipp <- sipp_0719 |>
   group_by(snap_hhid) |>
   summarize(
     hh_size = n(),
-    # Flags for exemptions
     has_elderly = any(TAGE >= 60, na.rm = TRUE),
     has_disabled = any(RDIS == 1, na.rm = TRUE),
-    has_ssi = any(RSSI_MNYN == 1, na.rm = TRUE),
-    has_tanf = any(RTANF_MNYN == 1, na.rm = TRUE),
+    has_ssi = all(RSSI_MNYN == 1, na.rm = TRUE),
+    has_tanf = all(RTANF_MNYN == 1, na.rm = TRUE),
     # Income
-    hh_gross_inc = sum(TPTOTINC, na.rm = TRUE),
-    hh_earn = sum(TPEARN, na.rm = TRUE),
+    hh_gross_inc = sum(TPTOTINC, na.rm = TRUE) * 1.25, # sipp undercounts apply this factor
+    hh_earn = sum(TPEARN, na.rm = TRUE) * 1.25, # sipp undercounts apply this factor
     # Deductions
     child_sup_ded = sum(TAMOUNTPAID, na.rm = TRUE),
-    child_care_ded = first(TPAYWK[!is.na(TPAYWK)], default = 0) * 4,
+    child_care_ded = sum(TPAYWK, na.rm = TRUE) * 4,    
     medical_costs = sum(TMDPAY, na.rm = TRUE),
     # Shelter (December of reference year as proxy)
     shelter_costs = coalesce(first(na.omit(THVAL_RMU)), 0),
-    # Countable assets — exclude home, retirement, educational savings
+    # Countable assets
     countable_assets = sum(TVAL_BANK, na.rm = TRUE) + sum(TVAL_BOND, na.rm = TRUE) +
                        sum(TVAL_BUS,  na.rm = TRUE) + sum(TVAL_STMF, na.rm = TRUE) +
                        sum(TVAL_RENT, na.rm = TRUE) + sum(TVAL_RE,   na.rm = TRUE) +
                        sum(TVAL_OTH,  na.rm = TRUE),
-    vehicle_assets = sum(TVAL_VEH, na.rm = TRUE),
-    # Household-level vehicle values for state exclusion rules
+    vehicle_assets = sum(TVAL_VEH, na.rm = TRUE) - 4650,
     tveh1_val = first(TVEH1VAL),
     tveh2_val = first(TVEH2VAL),
-    tveh3_val = first(TVEH3VAL),
-    # ABAWD flags — computed at person level, aggregated to household
-    has_children = any(TAGE < 18, na.rm = TRUE),
-    has_abawd_age = any(TAGE >= 18 & TAGE <= 49 & RDIS != 1, na.rm = TRUE),
-    abawd_meets_work = any(
-      (TAGE >= 18 & TAGE <= 49 & RDIS != 1) & (TMWKHRS >= 20), na.rm = TRUE),
-    has_any_citizen = any(ECITIZEN %in% c(1L, 2L), na.rm = TRUE), # confirm this
+    # ABAWD flags
+    has_children = any(TAGE < 18, na.rm = TRUE),      
+    youngest_child_age = if (any(TAGE < 26, na.rm = TRUE)) 
+                           as.numeric(min(TAGE[TAGE < 26], na.rm = TRUE))
+                         else NA_real_,
+    has_abawd_age = any(TAGE >= 18 & TAGE <= 49 & # baseline 18-49 flag
+                       (is.na(RDIS) | RDIS != 1), na.rm = TRUE),
+    has_adult_nondis_50_59 = any(TAGE >= 50 & TAGE <= 59 &
+                                (is.na(RDIS) | RDIS != 1), na.rm = TRUE),
+    has_adult_nondis_60_65 = any(TAGE >= 60 & TAGE <= 65 &
+                                (is.na(RDIS) | RDIS != 1), na.rm = TRUE),
+    max_work_hrs = max(c(0, TMWKHRS[TAGE >= 18 &         
+                       (is.na(RDIS) | RDIS != 1)]), na.rm = TRUE),
+    has_cit_or_elig_noncit = any(ECITIZEN == 1 | (TIMSTAT == 1 & TYRENTRY <= 2014), na.rm = TRUE), 
     state_fips = first(TEHC_ST),
-    weight = first(WPFINWGT),
+    weight = sum(WPFINWGT),
     snap_actual = any(RSNAP_MNYN == 1, na.rm = TRUE)
-  ) |>
-  # joining in snap eligibility rules 
-  left_join(snapdb, by = "state_fips")
+  )
 
 ```
 
 ## Eligibility Function
 
-Set up to allow us to change baslines, modify policies. Unforuntately we need all of these components in the function. 
+State-level BBCE and vehicle rules are looked up internally from
+`snapdb` using `state_fips`. We hardcoded three national or other
+baseline level policy levers which can then be modified for simulation.
+
+They are income, asset, and abawd work policy levers.
 
 ```{r}
-snap_elig_sim <- function(
-    hh_size, hh_gross_inc, hh_earn,
-    countable_assets, vehicle_assets, tveh1_val,
-    has_elderly, has_disabled, has_ssi, has_tanf,
-    has_children, has_abawd_age, abawd_meets_work,
-    has_any_citizen,
-    shelter_costs, child_sup_ded, child_care_ded, medical_costs,
-    bbce, bbce_inclmt, bbce_asset, bbce_a_amt,
-    bbce_child, bbce_elddisinclmt,
-    vehexclall, vehexclone, work_req,
-    # We can add in more baseline uniform scenarios here to change later
-    override_gross_pct = 1.30,   # federal default: 130% FPL
-    override_net_pct = 1.00,   # federal default: 100% FPL
-    override_asset_lmt = NULL,   #use federal/BBCE limits
-    override_elim_asset = FALSE,  # TRUE = eliminate asset test nationally
-    override_work_req = NULL   # use state-level work_req
+snap_elig_sim <- function(df,
+    # Note all of these can be changed as simulations: Income 
+    gross_pct = 1.30,     # gross income limit as fraction of FPL (federal default: 1.30)
+    net_pct = 1.00,     # net income limit as fraction of FPL   (federal default: 1.00)
+    use_bbce= TRUE,     # apply state BBCE income extensions
+    # Asset 
+    elim_asset = FALSE,  # TRUE = no asset test for anyone
+    asset_limit = NULL,   # set a uniform asset limit in dollars; NULL = federal/BBCE default
+    # Work 
+    work_req = NULL, # NULL = use state rules; "full_exemption"; "no_exemption"
+    abawd_max_age = 49,   # upper age of ABAWD range (federal default: 49)
+    min_work_hrs = 20,   # minimum weekly hours to meet work requirement 
+    dep_age = 18    # child must be under this age to exempt adult from ABAWD 
+) { with(df, 
+         {
+  # State snap policy
+  sp <- snapdb[match(state_fips, snapdb$state_fips), ]
 
-    ) 
-{
-  
   # FPL thresholds
-  fpl <- get_fpl(hh_size)
-  gross_limit <- fpl * override_gross_pct
-  net_limit <- fpl * override_net_pct
-  asset_limit <- if_else(has_elderly | has_disabled, 4500, 3000)
-  if (!is.null(override_asset_lmt)) asset_limit <- rep(override_asset_lmt, length(hh_size))
+  fpl       <- get_fpl(hh_size)
+  gross_lmt <- fpl * gross_pct
+  net_lmt   <- fpl * net_pct
+  fed_asset_lmt <- if_else(has_elderly | has_disabled, 3500, 2250)
+  if (!is.null(asset_limit)) fed_asset_lmt <- rep(asset_limit, length(hh_size))
 
-  # Net income
-  std_ded  <- get_std_ded(hh_size)
+  # Net income calculation
+  std_ded <- get_std_ded(hh_size)
   earn_ded <- hh_earn * 0.20
   net_pre_shelter <- pmax(hh_gross_inc - std_ded - earn_ded - child_sup_ded - child_care_ded, 0)
-  shelter_excess <- pmax(shelter_costs - 0.50 * net_pre_shelter, 0)
+  shelter_excess  <- pmax(shelter_costs - 0.50 * net_pre_shelter, 0)
   shelter_ded <- if_else(has_elderly | has_disabled,
-                         shelter_excess, pmin(shelter_excess, shelter_cap))
+                             shelter_excess, pmin(shelter_excess, shelter_cap))
   medical_ded <- if_else(has_elderly | has_disabled, pmax(medical_costs - 35, 0), 0)
   net_inc <- pmax(net_pre_shelter - shelter_ded - medical_ded, 0)
 
-  # Categorical eligibility
+  # Categorical eligibility (SSI/TANF bypasses income and asset tests)
   cat_elig <- has_ssi | has_tanf
 
-  # BBCE: only applies to childless households if bbce_child == 0
-  bbce_on      <- !is.na(bbce) & bbce == 1
-  bbce_applies <- bbce_on & !(coalesce(bbce_child, 0L) == 1L & !has_children)
+  # BBCE — look up from state policy; disabled when use_bbce = FALSE
+  bbce_on <- use_bbce & !is.na(sp$bbce) & sp$bbce == 1
+  bbce_applies <- bbce_on & !(coalesce(sp$bbce_child, 0L) == 1L & !has_children)
 
-  gross_limit_bbce <- if_else(bbce_applies & coalesce(bbce_inclmt, -9L) > 0,
-                               fpl * (bbce_inclmt / 100), gross_limit)
-  gross_limit_eld  <- if_else(bbce_applies & coalesce(bbce_elddisinclmt, -9L) > 0,
-                               fpl * (bbce_elddisinclmt / 100), gross_limit_bbce)
-  gross_limit_eff  <- if_else(has_elderly | has_disabled, gross_limit_eld, gross_limit_bbce)
+  gross_lmt_bbce <- if_else(bbce_applies & coalesce(sp$bbce_inclmt, -9L) > 0,
+                             fpl * (sp$bbce_inclmt / 100), gross_lmt)
+  gross_lmt_eld <- if_else(bbce_applies & coalesce(sp$bbce_elddisinclmt, -9L) > 0,
+                             fpl * (sp$bbce_elddisinclmt / 100), gross_lmt_bbce)
+  gross_lmt_eff <- if_else(has_elderly | has_disabled, gross_lmt_eld, gross_lmt_bbce)
 
-  asset_test_on   <- !(bbce_applies & !is.na(bbce_asset) & bbce_asset == 1)
-  asset_limit_eff <- case_when(
-    bbce_applies & coalesce(bbce_a_amt, 0) > 0 ~ bbce_a_amt * 1000,
-    TRUE                                        ~ asset_limit
+  asset_test_on <- !(bbce_applies & !is.na(sp$bbce_asset) & sp$bbce_asset == 1)
+  asset_lmt_eff <- case_when(
+    bbce_applies & coalesce(sp$bbce_a_amt, 0) > 0 ~ sp$bbce_a_amt * 1000,
+    TRUE ~ fed_asset_lmt
   )
-  if (override_elim_asset) asset_test_on <- rep(FALSE, length(hh_size))
+  if (elim_asset) asset_test_on <- rep(FALSE, length(hh_size))
 
-  # Vehicle countable value
+  # Vehicle countable value — look up state vehicle exclusion rules
   vehicle_countable <- case_when(
-    vehexclall == 1 ~ 0,
-    vehexclone == 1 ~ pmax(vehicle_assets - coalesce(tveh1_val, 0), 0),
-    TRUE            ~ vehicle_assets
+    sp$vehexclall == 1 ~ 0,
+    sp$vehexclone == 1 ~ pmax(vehicle_assets - coalesce(tveh1_val, 0), 0),
+    TRUE ~ vehicle_assets
   )
-  net_worth_countable <- countable_assets + vehicle_countable
+  net_worth <- countable_assets + vehicle_countable
 
-  # Individual tests
-  gross_elig <- hh_gross_inc <= gross_limit_eff
-  net_elig   <- net_inc      <= net_limit
-  asset_elig <- !asset_test_on | cat_elig | (net_worth_countable <= asset_limit_eff)
+  # Eligibility tests
+  gross_elig <- (has_elderly | has_disabled) | hh_gross_inc <= gross_lmt_eff
+  net_elig   <- net_inc      <= net_lmt
+  asset_elig <- !asset_test_on | cat_elig | (net_worth <= asset_lmt_eff)
 
-  # Work requirements
-  eff_work_req <- if (!is.null(override_work_req)) rep(override_work_req, length(hh_size)) else work_req
-  has_abawd    <- has_abawd_age & !has_children & !has_ssi & !has_tanf
-  work_elig    <- eff_work_req == "full_exemption" | !has_abawd | abawd_meets_work
+  eff_work_req <- if (!is.null(work_req)) rep(work_req, length(hh_size)) else sp$work_req
+  has_abawd_age_eff  <- has_abawd_age |
+                        (abawd_max_age >= 55 & has_adult_nondis_50_59) |
+                        (abawd_max_age >= 60 & has_adult_nondis_60_65)
+  has_qualifying_dep <- !is.na(youngest_child_age) & youngest_child_age < dep_age
+  meets_work_eff <- max_work_hrs >= min_work_hrs
+  has_abawd <- has_abawd_age_eff & !has_qualifying_dep & !has_ssi & !has_tanf
+  work_elig <- eff_work_req == "full_exemption" | !has_abawd | meets_work_eff
 
-  citizen_elig <- coalesce(has_any_citizen, TRUE) | cat_elig
+  citizen_elig <- coalesce(has_cit_or_elig_noncit, TRUE) | cat_elig
 
-  # Final eligibility
   (cat_elig | (gross_elig & net_elig)) & asset_elig & work_elig & citizen_elig
-}
+})}
+
 ```
 
 
-## Random Example to determine eligibility
-```{r}
-snap_elig_sim(
-    hh_size = 3, hh_gross_inc = 100, hh_earn = 100,
-    countable_assets = 0, vehicle_assets = 0, tveh1_val = 0,
-    has_elderly = FALSE, has_disabled = FALSE, has_ssi = FALSE, has_tanf = FALSE,
-    has_children = TRUE, has_abawd_age = TRUE, abawd_meets_work = FALSE,
-    has_any_citizen = TRUE,
-    shelter_costs = 100, child_sup_ded = 0, child_care_ded = 0, medical_costs = 0,
-    bbce = -9, bbce_inclmt = -9, bbce_asset = -9, bbce_a_amt = -9,
-    bbce_child = 0, bbce_elddisinclmt = -9,
-    vehexclall = 0, vehexclone = 0, work_req = "no_exemption")
-```
-## Scenario Sample
+## Scenario Functions
 
 ```{r}
 run_scenario <- function(data, scenario_name, ...) {
   data |>
-    mutate(
-      snap_eligible = snap_elig_sim(
-        hh_size, hh_gross_inc, hh_earn,
-        countable_assets, vehicle_assets, tveh1_val,
-        has_elderly, has_disabled, has_ssi, has_tanf,
-        has_children, has_abawd_age, abawd_meets_work,
-        has_any_citizen,
-        shelter_costs, child_sup_ded, child_care_ded, medical_costs,
-        bbce, bbce_inclmt, bbce_asset, bbce_a_amt,
-        bbce_child, bbce_elddisinclmt,
-        vehexclall, vehexclone, work_req,
-        ...
-      ),
-      scenario = scenario_name
-    )
+    mutate(snap_eligible = snap_elig_sim(pick(everything()), ...),
+           scenario = scenario_name)
 }
 
 summarize_scenario <- function(data) {
   data |>
     ungroup() |>
     summarize(
-      scenario            = first(scenario),
+      scenario = first(scenario),
       n_eligible_weighted = sum(snap_eligible * weight, na.rm = TRUE),
-      n_total_weighted    = sum(weight, na.rm = TRUE),
-      pct_eligible        = round(weighted.mean(snap_eligible, weight, na.rm = TRUE) * 100, 1)
-    )
+      n_total_weighted = sum(weight, na.rm = TRUE),
+      pct_eligible= round(weighted.mean(snap_eligible, weight, na.rm = TRUE) * 100, 1))
 }
 ```
 
 ## Run Scenarios
 
+Roughly [82% of SNAP eligible
+households](https://www.fns.usda.gov/research/snap/state-participation-rates/2019#:~:text=Key%20Findings,Page%20updated:%20April%2018%2C%202025)
+participate in snap in 2019. [July 2019 had 19 million
+households](https://www.fns.usda.gov/pd/supplemental-nutrition-assistance-program-snap).
+As such assuming the SIPP properly captures income, asset information,
+then we should have roughly 23.5 million households.
+
 ```{r}
+# Baseline: 2019 state rules as-is
 baseline <- run_scenario(hh_sipp, "Baseline (2019)")
-```
-Scenarios we can run
-```{r}
-scenario1 <- run_scenario(hh_sipp, "Eliminate asset test",
-                   override_elim_asset = TRUE)
 
-scenario2 <- run_scenario(hh_sipp, "Gross limit 200% FPL",
-                   override_gross_pct = 2.00)
+# Income
+income_200pct  <- run_scenario(hh_sipp, "Gross limit 200% FPL",
+                               gross_pct = 2.00)
 
-scenario3 <- run_scenario(hh_sipp, "Waive ABAWD nationally",
-                   override_work_req = "full_exemption")
+income_no_bbce <- run_scenario(hh_sipp, "Federal rules only (no BBCE)",
+                               use_bbce = FALSE)
 
+# Assets
+asset_elim <- run_scenario(hh_sipp, "Eliminate asset test",
+                           elim_asset = TRUE)
 
+asset_10k  <- run_scenario(hh_sipp, "Raise asset limit to $10k",
+                           asset_limit = 10000)
+
+# Work requirement scenarios 
+work_waive <- run_scenario(hh_sipp, "Waive ABAWD nationally",
+                             work_req = "full_exemption")
+
+work_enforce <- run_scenario(hh_sipp, "Enforce ABAWD nationally",
+                             work_req = "no_exemption")
+
+work_30hrs <- run_scenario(hh_sipp, "30-hour requirement", min_work_hrs = 30)
+
+work_dep5    <- run_scenario(hh_sipp, "Dep age cutoff 5", dep_age = 5)
+
+work_age65 <- run_scenario(hh_sipp, "ABAWD age 18-65", abawd_max_age = 65)
 ```
 
 ## Results
@@ -379,10 +388,20 @@ scenario3 <- run_scenario(hh_sipp, "Waive ABAWD nationally",
 ```{r}
 results <- bind_rows(
   summarize_scenario(baseline),
-  summarize_scenario(scenario1),
-  summarize_scenario(scenario2),
-  summarize_scenario(scenario3))
+  summarize_scenario(income_200pct),
+  summarize_scenario(income_no_bbce),
+  summarize_scenario(asset_elim),
+  summarize_scenario(asset_10k),
+  summarize_scenario(work_waive),
+  summarize_scenario(work_enforce),
+  summarize_scenario(work_30hrs),
+  summarize_scenario(work_dep5),
+  summarize_scenario(work_age65),
+) |>
+  mutate(
+    change_from_baseline = n_eligible_weighted - n_eligible_weighted[scenario == "Baseline (2019)"],
+    pct_change = round(100 * change_from_baseline / n_eligible_weighted[scenario == "Baseline (2019)"], 1)
+  )
 
 results
 ```
-
