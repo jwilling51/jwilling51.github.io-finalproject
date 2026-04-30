@@ -176,6 +176,10 @@ get_std_ded <- function(n){
 
 ## Aggregate to Household-Level SNAP Filing Units
 
+SNAP filing units are people who live and purchase food together. Given
+that SIPP doesn't account for people who consume food together, we use
+SSUID to account for the pseudo-economic unit.
+
 [It's important to note the SIPP is very well known for undercounting
 income
 information.](https://www.aeaweb.org/articles?id=10.1257/jep.29.4.199)
@@ -225,7 +229,6 @@ hh_sipp <- sipp_0719 |>
     weight = sum(WPFINWGT),
     snap_actual = any(RSNAP_MNYN == 1, na.rm = TRUE)
   )
-
 ```
 
 ## Eligibility Function
