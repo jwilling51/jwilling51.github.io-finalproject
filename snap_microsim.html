@@ -3113,27 +3113,36 @@ vertical-align: -.125em;
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
+<pre><code>Warning: package &#39;purrr&#39; was built under R version 4.5.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package &#39;dplyr&#39; was built under R version 4.5.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
 <pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-✔ dplyr     1.1.4     ✔ readr     2.1.5
-✔ forcats   1.0.1     ✔ stringr   1.5.1
-✔ ggplot2   4.0.0     ✔ tibble    3.2.1
+✔ dplyr     1.2.1     ✔ readr     2.1.5
+✔ forcats   1.0.0     ✔ stringr   1.5.1
+✔ ggplot2   3.5.2     ✔ tibble    3.3.0
 ✔ lubridate 1.9.4     ✔ tidyr     1.3.1
-✔ purrr     1.0.4     
+✔ purrr     1.2.1     
 ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
 ✖ dplyr::filter() masks stats::filter()
 ✖ dplyr::lag()    masks stats::lag()
 ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readxl)</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(data.table)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readxl)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(data.table)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package &#39;data.table&#39; was built under R version 4.5.2</code></pre>
+</div>
 <div class="cell-output cell-output-stderr">
 <pre><code>
 Attaching package: &#39;data.table&#39;
 
 The following objects are masked from &#39;package:lubridate&#39;:
 
-    hour, isoweek, mday, minute, month, quarter, second, wday, week,
-    yday, year
+    hour, isoweek, isoyear, mday, minute, month, quarter, second, wday,
+    week, yday, year
 
 The following objects are masked from &#39;package:dplyr&#39;:
 
@@ -3143,43 +3152,22 @@ The following object is masked from &#39;package:purrr&#39;:
 
     transpose</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(bit64)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(bit64)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Loading required package: bit
-
-Attaching package: &#39;bit&#39;
-
-The following object is masked from &#39;package:data.table&#39;:
-
-    setattr
-
-The following object is masked from &#39;package:dplyr&#39;:
-
-    symdiff
-
-The following object is masked from &#39;package:base&#39;:
-
-    xor
-
-Attaching package bit64
-package:bit64 (c) 2011-2017 Jens Oehlschlaegel
-creators: integer64 runif64 seq :
-coercion: as.integer64 as.vector as.logical as.integer as.double as.character as.bitstring
-logical operator: ! &amp; | xor != == &lt; &lt;= &gt;= &gt;
-arithmetic operator: + - * / %/% %% ^
-math: sign abs sqrt log log2 log10
-math: floor ceiling trunc round
-querying: is.integer64 is.vector [is.atomic} [length] format print str
-values: is.na is.nan is.finite is.infinite
-aggregation: any all min max range sum prod
-cumulation: diff cummin cummax cumsum cumprod
-access: length&lt;- [ [&lt;- [[ [[&lt;-
-combine: c rep cbind rbind as.data.frame
-WARNING don&#39;t use as subscripts
-WARNING semantics differ from integer
-for more help type ?bit64
+<pre><code>Warning: package &#39;bit64&#39; was built under R version 4.5.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>[1mThe assignment of character values to integer64 vectors and matrices with automatic coercion to integer64 will change to a more R consistent behaviour of coercing to character in future versions of bit64. If you wish you can update your code to the new behaviour by setting the option &#39;bit64.promoteInteger64ToCharacter&#39; to TRUE.[22m
 
 Attaching package: &#39;bit64&#39;
+
+The following objects are masked from &#39;package:lubridate&#39;:
+
+    intersect, setdiff, union
+
+The following objects are masked from &#39;package:dplyr&#39;:
+
+    intersect, setdiff, setequal, union
 
 The following object is masked from &#39;package:utils&#39;:
 
@@ -3187,9 +3175,11 @@ The following object is masked from &#39;package:utils&#39;:
 
 The following objects are masked from &#39;package:base&#39;:
 
-    :, %in%, colSums, is.double, match, order, rank, rowSums</code></pre>
+    :, %in%, array, as.factor, as.ordered, colSums, factor, intersect,
+    is.double, is.element, match, matrix, order, rank, rowSums,
+    setdiff, setequal, table, union</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(skimr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(skimr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: package &#39;skimr&#39; was built under R version 4.5.2</code></pre>
 </div>
@@ -3199,110 +3189,111 @@ The following objects are masked from &#39;package:base&#39;:
 <h2 class="anchored" data-anchor-id="load-snap-policy-database">Load SNAP Policy Database</h2>
 <p>This file contains state by state information on</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>snapdb <span class="ot">&lt;-</span> <span class="fu">read_xlsx</span>(<span class="st">&quot;data/SNAPPolicyDatabase.xlsx&quot;</span>, <span class="at">sheet =</span> <span class="st">&quot;SNAP Policy Database&quot;</span>) <span class="sc">|&gt;</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(yearmonth <span class="sc">==</span> <span class="dv">201907</span>) <span class="sc">|&gt;</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">starts_with</span>(<span class="st">&quot;state&quot;</span>), <span class="fu">starts_with</span>(<span class="st">&quot;bbce&quot;</span>), <span class="fu">starts_with</span>(<span class="st">&quot;veh&quot;</span>))</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Work requirement tiers based on FY2019 Q4 ABAWD waiver status</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>state_exempt <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Alaska&quot;</span>, <span class="st">&quot;District of Columbia&quot;</span>, <span class="st">&quot;Louisiana&quot;</span>, <span class="st">&quot;New Mexico&quot;</span>)</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>state_nonexempt <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Alabama&quot;</span>, <span class="st">&quot;Arkansas&quot;</span>, <span class="st">&quot;Delaware&quot;</span>, <span class="st">&quot;Florida&quot;</span>, <span class="st">&quot;Indiana&quot;</span>,</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>                     <span class="st">&quot;Iowa&quot;</span>, <span class="st">&quot;Kansas&quot;</span>, <span class="st">&quot;Maine&quot;</span>, <span class="st">&quot;Mississippi&quot;</span>, <span class="st">&quot;Missouri&quot;</span>,</span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>                     <span class="st">&quot;Nebraska&quot;</span>, <span class="st">&quot;North Carolina&quot;</span>, <span class="st">&quot;Oklahoma&quot;</span>, <span class="st">&quot;South Carolina&quot;</span>,</span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>                     <span class="st">&quot;Texas&quot;</span>, <span class="st">&quot;Wisconsin&quot;</span>, <span class="st">&quot;Wyoming&quot;</span>)</span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>snapdb <span class="ot">&lt;-</span> snapdb <span class="sc">|&gt;</span></span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">work_req =</span> <span class="fu">case_when</span>(</span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>    statename <span class="sc">%in%</span> state_exempt <span class="sc">~</span> <span class="st">&quot;full_exemption&quot;</span>,</span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>    statename <span class="sc">%in%</span> state_nonexempt <span class="sc">~</span> <span class="st">&quot;no_exemption&quot;</span>,</span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">&quot;partial_exemption&quot;</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>snapdb <span class="ot">&lt;-</span> <span class="fu">read_xlsx</span>(<span class="st">&quot;data/SNAPPolicyDatabase.xlsx&quot;</span>, <span class="at">sheet =</span> <span class="st">&quot;SNAP Policy Database&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(yearmonth <span class="sc">==</span> <span class="dv">201907</span>) <span class="sc">|&gt;</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">starts_with</span>(<span class="st">&quot;state&quot;</span>), <span class="fu">starts_with</span>(<span class="st">&quot;bbce&quot;</span>), <span class="fu">starts_with</span>(<span class="st">&quot;veh&quot;</span>))</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Work requirement tiers based on FY2019 Q4 ABAWD waiver status</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>state_exempt <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Alaska&quot;</span>, <span class="st">&quot;District of Columbia&quot;</span>, <span class="st">&quot;Louisiana&quot;</span>, <span class="st">&quot;New Mexico&quot;</span>)</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>state_nonexempt <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Alabama&quot;</span>, <span class="st">&quot;Arkansas&quot;</span>, <span class="st">&quot;Delaware&quot;</span>, <span class="st">&quot;Florida&quot;</span>, <span class="st">&quot;Indiana&quot;</span>,</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>                     <span class="st">&quot;Iowa&quot;</span>, <span class="st">&quot;Kansas&quot;</span>, <span class="st">&quot;Maine&quot;</span>, <span class="st">&quot;Mississippi&quot;</span>, <span class="st">&quot;Missouri&quot;</span>,</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>                     <span class="st">&quot;Nebraska&quot;</span>, <span class="st">&quot;North Carolina&quot;</span>, <span class="st">&quot;Oklahoma&quot;</span>, <span class="st">&quot;South Carolina&quot;</span>,</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>                     <span class="st">&quot;Texas&quot;</span>, <span class="st">&quot;Wisconsin&quot;</span>, <span class="st">&quot;Wyoming&quot;</span>)</span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>snapdb <span class="ot">&lt;-</span> snapdb <span class="sc">|&gt;</span></span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">work_req =</span> <span class="fu">case_when</span>(</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>    statename <span class="sc">%in%</span> state_exempt <span class="sc">~</span> <span class="st">&quot;full_exemption&quot;</span>,</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>    statename <span class="sc">%in%</span> state_nonexempt <span class="sc">~</span> <span class="st">&quot;no_exemption&quot;</span>,</span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">&quot;partial_exemption&quot;</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="load-sipp-2019" class="level2">
 <h2 class="anchored" data-anchor-id="load-sipp-2019">Load SIPP 2019</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>ds <span class="ot">&lt;-</span> <span class="st">&quot;data/pu2019.csv&quot;</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>all_cols <span class="ot">&lt;-</span> <span class="fu">names</span>(<span class="fu">fread</span>(ds, <span class="at">sep =</span> <span class="st">&quot;|&quot;</span>, <span class="at">nrows =</span> <span class="dv">0</span>))</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>exact_vars <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ID variables</span></span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;SSUID&#39;</span>, <span class="st">&#39;PNUM&#39;</span>, <span class="st">&#39;MONTHCODE&#39;</span>, <span class="st">&#39;ERESIDENCEID&#39;</span>, <span class="st">&#39;ERELRPE&#39;</span>, <span class="st">&#39;SPANEL&#39;</span>, <span class="st">&#39;SWAVE&#39;</span>,</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;SHHADID&#39;</span>, <span class="st">&#39;THHLDSTATUS&#39;</span>, <span class="st">&#39;RIN_UNIV&#39;</span>,</span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Base weight</span></span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;WPFINWGT&#39;</span>,</span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>  <span class="co"># State of residence</span></span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;TEHC_ST&#39;</span>, <span class="st">&#39;TST_INTV&#39;</span>,</span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Demographics</span></span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;ESEX&#39;</span>, <span class="st">&#39;TAGE&#39;</span>, <span class="st">&#39;TAGE_EHC&#39;</span>, <span class="st">&#39;ERACE&#39;</span>, <span class="st">&#39;EORIGIN&#39;</span>, <span class="st">&#39;EEDUC&#39;</span>,</span>
-<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;ECITIZEN&#39;</span>, <span class="st">&#39;ENATIVITY&#39;</span>, <span class="st">&#39;EIMM_STAT&#39;</span>,</span>
-<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;EDISABL&#39;</span>, <span class="st">&#39;RDIS&#39;</span>, <span class="st">&#39;RDIS_ALT&#39;</span>,</span>
-<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Household structure</span></span>
-<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;TLIVQTR&#39;</span>, <span class="st">&#39;ETENURE&#39;</span>, <span class="st">&#39;EMS&#39;</span>,</span>
-<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Income</span></span>
-<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;TPTOTINC&#39;</span>, <span class="st">&#39;TPEARN&#39;</span>, <span class="st">&#39;TFTOTINC&#39;</span>,</span>
-<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;TUNEMP_AMT&#39;</span>, <span class="st">&#39;TSSI_AMT&#39;</span>, <span class="st">&#39;TSSRX&#39;</span>, <span class="st">&#39;TSSXAMT&#39;</span>, <span class="st">&#39;TTANF_AMT&#39;</span>,</span>
-<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Deductions</span></span>
-<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;TAMOUNTPAID&#39;</span>, <span class="st">&#39;TPAYWK&#39;</span>, <span class="st">&#39;TRENTMORT&#39;</span>, <span class="st">&#39;TUTILS&#39;</span>, <span class="st">&#39;THVAL_RMU&#39;</span>,</span>
-<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;TCHCARE_AMT&#39;</span>, <span class="st">&#39;TMDPAY&#39;</span>,</span>
-<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Assets (individual-level; shared assets divided equally)</span></span>
-<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;TVAL_AST&#39;</span>, <span class="st">&#39;TVAL_BANK&#39;</span>, <span class="st">&#39;TVAL_BOND&#39;</span>, <span class="st">&#39;TVAL_BUS&#39;</span>, <span class="st">&#39;TVAL_ESAV&#39;</span>,</span>
-<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;TVAL_HOME&#39;</span>, <span class="st">&#39;TVAL_RENT&#39;</span>, <span class="st">&#39;TVAL_RE&#39;</span>, <span class="st">&#39;TVAL_RET&#39;</span>,</span>
-<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;TVAL_STMF&#39;</span>, <span class="st">&#39;TVAL_VEH&#39;</span>, <span class="st">&#39;TVAL_OTH&#39;</span>,</span>
-<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Program participation</span></span>
-<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;RFSCOV&#39;</span>, <span class="st">&#39;RSNAP_MNYN&#39;</span>, <span class="st">&#39;RTANF_MNYN&#39;</span>, <span class="st">&#39;RSSI_MNYN&#39;</span>, <span class="st">&#39;RWICYN&#39;</span>,</span>
-<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ABAWD work requirement variables</span></span>
-<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;TMWKHRS&#39;</span>, <span class="st">&#39;EWELACTV2_1&#39;</span>, <span class="st">&#39;EWELACTV2_2&#39;</span>, <span class="st">&#39;EWELACTV2_3&#39;</span>, <span class="st">&#39;EWELACTV4&#39;</span></span>
-<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb10-43"><a href="#cb10-43" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-44"><a href="#cb10-44" aria-hidden="true" tabindex="-1"></a>patterns <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb10-45"><a href="#cb10-45" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;^RREL&quot;</span>, <span class="st">&quot;^ET2REL&quot;</span>, <span class="st">&quot;^SNAP&quot;</span>, <span class="st">&quot;^TEHC&quot;</span>,</span>
-<span id="cb10-46"><a href="#cb10-46" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;^EOWN&quot;</span>, <span class="st">&quot;^EJSOWN&quot;</span>, <span class="st">&quot;^EJOOWN&quot;</span>, <span class="st">&quot;^EOOWN&quot;</span>,</span>
-<span id="cb10-47"><a href="#cb10-47" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;^TJS&quot;</span>, <span class="st">&quot;^TJO&quot;</span>, <span class="st">&quot;^VAL&quot;</span>, <span class="st">&quot;^EVEH&quot;</span>, <span class="st">&quot;^TVEH&quot;</span></span>
-<span id="cb10-48"><a href="#cb10-48" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb10-49"><a href="#cb10-49" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-50"><a href="#cb10-50" aria-hidden="true" tabindex="-1"></a>pattern_vars <span class="ot">&lt;-</span> <span class="fu">unique</span>(<span class="fu">unlist</span>(<span class="fu">lapply</span>(patterns, <span class="cf">function</span>(p) <span class="fu">grep</span>(p, all_cols, <span class="at">value =</span> <span class="cn">TRUE</span>))))</span>
-<span id="cb10-51"><a href="#cb10-51" aria-hidden="true" tabindex="-1"></a>keep_vars    <span class="ot">&lt;-</span> <span class="fu">unique</span>(<span class="fu">c</span>(exact_vars, pattern_vars))</span>
-<span id="cb10-52"><a href="#cb10-52" aria-hidden="true" tabindex="-1"></a>keep_vars    <span class="ot">&lt;-</span> keep_vars[keep_vars <span class="sc">%in%</span> all_cols]</span>
-<span id="cb10-53"><a href="#cb10-53" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-54"><a href="#cb10-54" aria-hidden="true" tabindex="-1"></a>pu <span class="ot">&lt;-</span> <span class="fu">fread</span>(ds, <span class="at">sep =</span> <span class="st">&quot;|&quot;</span>, <span class="at">select =</span> keep_vars)</span>
-<span id="cb10-55"><a href="#cb10-55" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(pu) <span class="ot">&lt;-</span> <span class="fu">toupper</span>(<span class="fu">names</span>(pu))</span>
-<span id="cb10-56"><a href="#cb10-56" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-57"><a href="#cb10-57" aria-hidden="true" tabindex="-1"></a>dw <span class="ot">&lt;-</span> <span class="st">&quot;data/rw2019.csv&quot;</span></span>
-<span id="cb10-58"><a href="#cb10-58" aria-hidden="true" tabindex="-1"></a>rw <span class="ot">&lt;-</span> <span class="fu">fread</span>(dw, <span class="at">sep =</span> <span class="st">&quot;|&quot;</span>)</span>
-<span id="cb10-59"><a href="#cb10-59" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(rw) <span class="ot">&lt;-</span> <span class="fu">toupper</span>(<span class="fu">names</span>(rw))</span>
-<span id="cb10-60"><a href="#cb10-60" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-61"><a href="#cb10-61" aria-hidden="true" tabindex="-1"></a>sipp2019 <span class="ot">&lt;-</span> <span class="fu">left_join</span>(pu, rw, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;SSUID&quot;</span>, <span class="st">&quot;PNUM&quot;</span>, <span class="st">&quot;MONTHCODE&quot;</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>ds <span class="ot">&lt;-</span> <span class="st">&quot;data/pu2019.csv&quot;</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>all_cols <span class="ot">&lt;-</span> <span class="fu">names</span>(<span class="fu">fread</span>(ds, <span class="at">sep =</span> <span class="st">&quot;|&quot;</span>, <span class="at">nrows =</span> <span class="dv">0</span>))</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>exact_vars <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ID variables</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;SSUID&#39;</span>, <span class="st">&#39;PNUM&#39;</span>, <span class="st">&#39;MONTHCODE&#39;</span>, <span class="st">&#39;ERESIDENCEID&#39;</span>, <span class="st">&#39;ERELRPE&#39;</span>, <span class="st">&#39;SPANEL&#39;</span>, <span class="st">&#39;SWAVE&#39;</span>,</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;SHHADID&#39;</span>, <span class="st">&#39;THHLDSTATUS&#39;</span>, <span class="st">&#39;RIN_UNIV&#39;</span>,</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Base weight</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;WPFINWGT&#39;</span>,</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>  <span class="co"># State of residence</span></span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;TEHC_ST&#39;</span>, <span class="st">&#39;TST_INTV&#39;</span>,</span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Demographics</span></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;ESEX&#39;</span>, <span class="st">&#39;TAGE&#39;</span>, <span class="st">&#39;TAGE_EHC&#39;</span>, <span class="st">&#39;ERACE&#39;</span>, <span class="st">&#39;EORIGIN&#39;</span>, <span class="st">&#39;EEDUC&#39;</span>,</span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;ECITIZEN&#39;</span>, <span class="st">&#39;ENATIVITY&#39;</span>, <span class="st">&#39;EIMM_STAT&#39;</span>, <span class="st">&#39;TIMSTAT&#39;</span>, <span class="st">&#39;TYRENTRY&#39;</span>,</span>
+<span id="cb14-19"><a href="#cb14-19" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;EDISABL&#39;</span>, <span class="st">&#39;RDIS&#39;</span>, <span class="st">&#39;RDIS_ALT&#39;</span>,</span>
+<span id="cb14-20"><a href="#cb14-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-21"><a href="#cb14-21" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Household structure</span></span>
+<span id="cb14-22"><a href="#cb14-22" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;TLIVQTR&#39;</span>, <span class="st">&#39;ETENURE&#39;</span>, <span class="st">&#39;EMS&#39;</span>,</span>
+<span id="cb14-23"><a href="#cb14-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-24"><a href="#cb14-24" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Income</span></span>
+<span id="cb14-25"><a href="#cb14-25" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;TPTOTINC&#39;</span>, <span class="st">&#39;TPEARN&#39;</span>, <span class="st">&#39;TFTOTINC&#39;</span>,</span>
+<span id="cb14-26"><a href="#cb14-26" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;TUNEMP_AMT&#39;</span>, <span class="st">&#39;TSSI_AMT&#39;</span>, <span class="st">&#39;TSSRX&#39;</span>, <span class="st">&#39;TSSXAMT&#39;</span>, <span class="st">&#39;TTANF_AMT&#39;</span>,</span>
+<span id="cb14-27"><a href="#cb14-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-28"><a href="#cb14-28" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Deductions</span></span>
+<span id="cb14-29"><a href="#cb14-29" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;TAMOUNTPAID&#39;</span>, <span class="st">&#39;TPAYWK&#39;</span>, <span class="st">&#39;TRENTMORT&#39;</span>, <span class="st">&#39;TUTILS&#39;</span>, <span class="st">&#39;THVAL_RMU&#39;</span>,</span>
+<span id="cb14-30"><a href="#cb14-30" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;TCHCARE_AMT&#39;</span>, <span class="st">&#39;TMDPAY&#39;</span>,</span>
+<span id="cb14-31"><a href="#cb14-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-32"><a href="#cb14-32" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Assets (individual-level; shared assets divided equally)</span></span>
+<span id="cb14-33"><a href="#cb14-33" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;TVAL_AST&#39;</span>, <span class="st">&#39;TVAL_BANK&#39;</span>, <span class="st">&#39;TVAL_BOND&#39;</span>, <span class="st">&#39;TVAL_BUS&#39;</span>, <span class="st">&#39;TVAL_ESAV&#39;</span>,</span>
+<span id="cb14-34"><a href="#cb14-34" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;TVAL_HOME&#39;</span>, <span class="st">&#39;TVAL_RENT&#39;</span>, <span class="st">&#39;TVAL_RE&#39;</span>, <span class="st">&#39;TVAL_RET&#39;</span>,</span>
+<span id="cb14-35"><a href="#cb14-35" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;TVAL_STMF&#39;</span>, <span class="st">&#39;TVAL_VEH&#39;</span>, <span class="st">&#39;TVAL_OTH&#39;</span>,</span>
+<span id="cb14-36"><a href="#cb14-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-37"><a href="#cb14-37" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Program participation</span></span>
+<span id="cb14-38"><a href="#cb14-38" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;RFSCOV&#39;</span>, <span class="st">&#39;RSNAP_MNYN&#39;</span>, <span class="st">&#39;RTANF_MNYN&#39;</span>, <span class="st">&#39;RSSI_MNYN&#39;</span>, <span class="st">&#39;RWICYN&#39;</span>,</span>
+<span id="cb14-39"><a href="#cb14-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-40"><a href="#cb14-40" aria-hidden="true" tabindex="-1"></a>  <span class="co"># ABAWD work requirement variables</span></span>
+<span id="cb14-41"><a href="#cb14-41" aria-hidden="true" tabindex="-1"></a>  <span class="st">&#39;TMWKHRS&#39;</span>, <span class="st">&#39;EWELACTV2_1&#39;</span>, <span class="st">&#39;EWELACTV2_2&#39;</span>, <span class="st">&#39;EWELACTV2_3&#39;</span>, <span class="st">&#39;EWELACTV4&#39;</span></span>
+<span id="cb14-42"><a href="#cb14-42" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb14-43"><a href="#cb14-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-44"><a href="#cb14-44" aria-hidden="true" tabindex="-1"></a>patterns <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb14-45"><a href="#cb14-45" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;^RREL&quot;</span>, <span class="st">&quot;^ET2REL&quot;</span>, <span class="st">&quot;^SNAP&quot;</span>, <span class="st">&quot;^TEHC&quot;</span>,</span>
+<span id="cb14-46"><a href="#cb14-46" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;^EOWN&quot;</span>, <span class="st">&quot;^EJSOWN&quot;</span>, <span class="st">&quot;^EJOOWN&quot;</span>, <span class="st">&quot;^EOOWN&quot;</span>,</span>
+<span id="cb14-47"><a href="#cb14-47" aria-hidden="true" tabindex="-1"></a>  <span class="st">&quot;^TJS&quot;</span>, <span class="st">&quot;^TJO&quot;</span>, <span class="st">&quot;^VAL&quot;</span>, <span class="st">&quot;^EVEH&quot;</span>, <span class="st">&quot;^TVEH&quot;</span></span>
+<span id="cb14-48"><a href="#cb14-48" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb14-49"><a href="#cb14-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-50"><a href="#cb14-50" aria-hidden="true" tabindex="-1"></a>pattern_vars <span class="ot">&lt;-</span> <span class="fu">unique</span>(<span class="fu">unlist</span>(<span class="fu">lapply</span>(patterns, <span class="cf">function</span>(p) <span class="fu">grep</span>(p, all_cols, <span class="at">value =</span> <span class="cn">TRUE</span>))))</span>
+<span id="cb14-51"><a href="#cb14-51" aria-hidden="true" tabindex="-1"></a>keep_vars    <span class="ot">&lt;-</span> <span class="fu">unique</span>(<span class="fu">c</span>(exact_vars, pattern_vars))</span>
+<span id="cb14-52"><a href="#cb14-52" aria-hidden="true" tabindex="-1"></a>keep_vars    <span class="ot">&lt;-</span> keep_vars[keep_vars <span class="sc">%in%</span> all_cols]</span>
+<span id="cb14-53"><a href="#cb14-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-54"><a href="#cb14-54" aria-hidden="true" tabindex="-1"></a>pu <span class="ot">&lt;-</span> <span class="fu">fread</span>(ds, <span class="at">sep =</span> <span class="st">&quot;|&quot;</span>, <span class="at">select =</span> keep_vars)</span>
+<span id="cb14-55"><a href="#cb14-55" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(pu) <span class="ot">&lt;-</span> <span class="fu">toupper</span>(<span class="fu">names</span>(pu))</span>
+<span id="cb14-56"><a href="#cb14-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-57"><a href="#cb14-57" aria-hidden="true" tabindex="-1"></a>dw <span class="ot">&lt;-</span> <span class="st">&quot;data/rw2019.csv&quot;</span></span>
+<span id="cb14-58"><a href="#cb14-58" aria-hidden="true" tabindex="-1"></a>rw <span class="ot">&lt;-</span> <span class="fu">fread</span>(dw, <span class="at">sep =</span> <span class="st">&quot;|&quot;</span>)</span>
+<span id="cb14-59"><a href="#cb14-59" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(rw) <span class="ot">&lt;-</span> <span class="fu">toupper</span>(<span class="fu">names</span>(rw))</span>
+<span id="cb14-60"><a href="#cb14-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-61"><a href="#cb14-61" aria-hidden="true" tabindex="-1"></a>sipp2019 <span class="ot">&lt;-</span> <span class="fu">left_join</span>(pu, rw, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;SSUID&quot;</span>, <span class="st">&quot;PNUM&quot;</span>, <span class="st">&quot;MONTHCODE&quot;</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="filter-to-july-2019-and-generate" class="level2">
-<h2 class="anchored" data-anchor-id="filter-to-july-2019-and-generate">Filter to July 2019 and generate</h2>
+<section id="filter-to-july-2019-and-generate-new-snap-unit-id" class="level2">
+<h2 class="anchored" data-anchor-id="filter-to-july-2019-and-generate-new-snap-unit-id">Filter to July 2019 and generate new SNAP unit ID</h2>
+<p>Households are uniquely identified by SSUID and SHHADID, but some households may contain multiple SNAP units, defined as people who live and purchase food together. The SIPP does not directly ask about this, but we approximate it based on household relationships. We assume that family members and partners living together are part of the same SNAP unit, while roommates/boarders/other non-family members are not.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>sipp_0719 <span class="ot">&lt;-</span> sipp2019 <span class="sc">|&gt;</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(RIN_UNIV <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> MONTHCODE <span class="sc">==</span> <span class="dv">7</span>) <span class="sc">|&gt;</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">hhid =</span> <span class="fu">paste0</span>(<span class="fu">as.character</span>(SSUID), <span class="fu">as.character</span>(SHHADID))) <span class="sc">|&gt;</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(hhid) <span class="sc">|&gt;</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">snap_split =</span> ERELRPE <span class="sc">%in%</span> <span class="dv">16</span><span class="sc">:</span><span class="dv">18</span>, <span class="co"># splitting cases that are roommates/boarders/other non-family into separate SNAP unit</span></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">split_id =</span> <span class="fu">if_else</span>(snap_split, <span class="fu">cumsum</span>(snap_split), <span class="cn">NA_integer_</span>),</span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">snapuid =</span> <span class="fu">case_when</span>(<span class="sc">!</span>snap_split <span class="sc">~</span> <span class="dv">1</span>,</span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>         snap_split <span class="sc">~</span> split_id <span class="sc">+</span> <span class="dv">1</span>)</span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span> <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">snap_hhid =</span> <span class="fu">paste0</span>(hhid, snapuid))</span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Brief checks to make sure split went correctly</span></span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>sipp_0719 <span class="sc">|&gt;</span></span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(hhid) <span class="sc">|&gt;</span></span>
-<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n_snap_units =</span> <span class="fu">n_distinct</span>(snap_hhid)) <span class="sc">|&gt;</span></span>
-<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(n_snap_units)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>sipp_0719 <span class="ot">&lt;-</span> sipp2019 <span class="sc">|&gt;</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(RIN_UNIV <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> MONTHCODE <span class="sc">==</span> <span class="dv">7</span>) <span class="sc">|&gt;</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">hhid =</span> <span class="fu">paste0</span>(<span class="fu">as.character</span>(SSUID), <span class="fu">as.character</span>(SHHADID))) <span class="sc">|&gt;</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(hhid) <span class="sc">|&gt;</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">snap_split =</span> ERELRPE <span class="sc">%in%</span> <span class="dv">16</span><span class="sc">:</span><span class="dv">18</span>, <span class="co"># splitting cases that are roommates/boarders/other non-family into separate SNAP unit</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">split_id =</span> <span class="fu">if_else</span>(snap_split, <span class="fu">cumsum</span>(snap_split), <span class="cn">NA_integer_</span>),</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">snapuid =</span> <span class="fu">case_when</span>(<span class="sc">!</span>snap_split <span class="sc">~</span> <span class="dv">1</span>,</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>         snap_split <span class="sc">~</span> split_id <span class="sc">+</span> <span class="dv">1</span>)</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span> <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">snap_hhid =</span> <span class="fu">paste0</span>(hhid, snapuid))</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Brief checks to make sure split went correctly</span></span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>sipp_0719 <span class="sc">|&gt;</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(hhid) <span class="sc">|&gt;</span></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n_snap_units =</span> <span class="fu">n_distinct</span>(snap_hhid)) <span class="sc">|&gt;</span></span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(n_snap_units)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 8 × 2
   n_snap_units     n
@@ -3316,13 +3307,13 @@ The following objects are masked from &#39;package:base&#39;:
 7            7     1
 8            8     1</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>sipp_0719 <span class="sc">|&gt;</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(hhid) <span class="sc">|&gt;</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">n_distinct</span>(snap_hhid) <span class="sc">&gt;</span> <span class="dv">1</span>) <span class="sc">|&gt;</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(hhid, snap_hhid) <span class="sc">|&gt;</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(hhid, ERELRPE, snap_hhid) <span class="sc">|&gt;</span></span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_head</span>(<span class="at">n =</span> <span class="dv">50</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>sipp_0719 <span class="sc">|&gt;</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(hhid) <span class="sc">|&gt;</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">n_distinct</span>(snap_hhid) <span class="sc">&gt;</span> <span class="dv">1</span>) <span class="sc">|&gt;</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(hhid, snap_hhid) <span class="sc">|&gt;</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(hhid, ERELRPE, snap_hhid) <span class="sc">|&gt;</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_head</span>(<span class="at">n =</span> <span class="dv">50</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 50 × 3
    hhid             ERELRPE snap_hhid        
@@ -3344,24 +3335,24 @@ The following objects are masked from &#39;package:base&#39;:
 <section id="fpl-and-deduction-limits" class="level2">
 <h2 class="anchored" data-anchor-id="fpl-and-deduction-limits">FPL and Deduction Limits</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 2019 monthly FPL (contiguous 48 states and DC)</span></span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co"># https://aspe.hhs.gov/topics/poverty-economic-mobility/poverty-guidelines/prior-hhs-poverty-guidelines-federal-register-references/2019-poverty-guidelines </span></span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>fpl_monthly    <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1041</span>, <span class="dv">1410</span>, <span class="dv">1778</span>, <span class="dv">2146</span>, <span class="dv">2515</span>, <span class="dv">2883</span>, <span class="dv">3251</span>, <span class="dv">3620</span>)</span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>fpl_additional <span class="ot">&lt;-</span> <span class="dv">369</span></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 2019 standard deductions by household size (caps at 6)</span></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a><span class="co"># https://cvlas.org/wp-content/uploads/2022/08/supp-nutrition-assist-prog-SNAP-2019.pdf</span></span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>std_ded_tbl <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">167</span>, <span class="dv">167</span>, <span class="dv">167</span>, <span class="dv">178</span>, <span class="dv">208</span>, <span class="dv">238</span>)</span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Excess shelter deduction cap for non-elderly/disabled households</span></span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>shelter_cap <span class="ot">&lt;-</span> <span class="dv">552</span></span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>get_fpl <span class="ot">&lt;-</span> <span class="cf">function</span>(n){</span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>  fpl_monthly[<span class="fu">pmin</span>(n, <span class="dv">8</span>)] <span class="sc">+</span> <span class="fu">pmax</span>(n <span class="sc">-</span> <span class="dv">8</span>, <span class="dv">0</span>) <span class="sc">*</span> fpl_additional</span>
-<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>get_std_ded <span class="ot">&lt;-</span> <span class="cf">function</span>(n){</span>
-<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>  std_ded_tbl[<span class="fu">pmin</span>(n, <span class="dv">6</span>)]</span>
-<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># 2019 monthly FPL (contiguous 48 states and DC)</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="co"># https://aspe.hhs.gov/topics/poverty-economic-mobility/poverty-guidelines/prior-hhs-poverty-guidelines-federal-register-references/2019-poverty-guidelines </span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>fpl_monthly    <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">1041</span>, <span class="dv">1410</span>, <span class="dv">1778</span>, <span class="dv">2146</span>, <span class="dv">2515</span>, <span class="dv">2883</span>, <span class="dv">3251</span>, <span class="dv">3620</span>)</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>fpl_additional <span class="ot">&lt;-</span> <span class="dv">369</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="co"># 2019 standard deductions by household size (caps at 6)</span></span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="co"># https://cvlas.org/wp-content/uploads/2022/08/supp-nutrition-assist-prog-SNAP-2019.pdf</span></span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>std_ded_tbl <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">167</span>, <span class="dv">167</span>, <span class="dv">167</span>, <span class="dv">178</span>, <span class="dv">208</span>, <span class="dv">238</span>)</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="co"># Excess shelter deduction cap for non-elderly/disabled households</span></span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>shelter_cap <span class="ot">&lt;-</span> <span class="dv">552</span></span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>get_fpl <span class="ot">&lt;-</span> <span class="cf">function</span>(n){</span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>  fpl_monthly[<span class="fu">pmin</span>(n, <span class="dv">8</span>)] <span class="sc">+</span> <span class="fu">pmax</span>(n <span class="sc">-</span> <span class="dv">8</span>, <span class="dv">0</span>) <span class="sc">*</span> fpl_additional</span>
+<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>get_std_ded <span class="ot">&lt;-</span> <span class="cf">function</span>(n){</span>
+<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a>  std_ded_tbl[<span class="fu">pmin</span>(n, <span class="dv">6</span>)]</span>
+<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="aggregate-to-household-level-snap-filing-units" class="level2">
@@ -3369,50 +3360,50 @@ The following objects are masked from &#39;package:base&#39;:
 <p>SNAP filing units are people who live and purchase food together. Given that SIPP doesn’t account for people who consume food together, we use SSUID to account for the pseudo-economic unit.</p>
 <p><a href="https://www.aeaweb.org/articles?id=10.1257/jep.29.4.199">It’s important to note the SIPP is very well known for undercounting income information.</a></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Aggregation</span></span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>hh_sipp <span class="ot">&lt;-</span> sipp_0719 <span class="sc">|&gt;</span></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(snap_hhid) <span class="sc">|&gt;</span></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">hh_size =</span> <span class="fu">n</span>(),</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">has_elderly =</span> <span class="fu">any</span>(TAGE <span class="sc">&gt;=</span> <span class="dv">60</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">has_disabled =</span> <span class="fu">any</span>(RDIS <span class="sc">==</span> <span class="dv">1</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">has_ssi =</span> <span class="fu">any</span>(RSSI_MNYN <span class="sc">==</span> <span class="dv">1</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">has_tanf =</span> <span class="fu">any</span>(RTANF_MNYN <span class="sc">==</span> <span class="dv">1</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Income</span></span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">hh_gross_inc =</span> <span class="fu">sum</span>(TPTOTINC, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">*</span> <span class="fl">1.25</span>, <span class="co"># sipp undercounts apply this factor</span></span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">hh_earn =</span> <span class="fu">sum</span>(TPEARN, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">*</span> <span class="fl">1.25</span>, <span class="co"># sipp undercounts apply this factor</span></span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Deductions</span></span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">child_sup_ded =</span> <span class="fu">sum</span>(TAMOUNTPAID, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">child_care_ded =</span> <span class="fu">sum</span>(TPAYWK, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">*</span> <span class="dv">4</span>,    </span>
-<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">medical_costs =</span> <span class="fu">sum</span>(TMDPAY, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Shelter (December of reference year as proxy)</span></span>
-<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">shelter_costs =</span> <span class="fu">coalesce</span>(<span class="fu">first</span>(<span class="fu">na.omit</span>(THVAL_RMU)), <span class="dv">0</span>),</span>
-<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Countable assets</span></span>
-<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">countable_assets =</span> <span class="fu">sum</span>(TVAL_BANK, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">+</span> <span class="fu">sum</span>(TVAL_BOND, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
-<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>                       <span class="fu">sum</span>(TVAL_BUS,  <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">+</span> <span class="fu">sum</span>(TVAL_STMF, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
-<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>                       <span class="fu">sum</span>(TVAL_RENT, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">+</span> <span class="fu">sum</span>(TVAL_RE,   <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
-<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>                       <span class="fu">sum</span>(TVAL_OTH,  <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">vehicle_assets =</span> <span class="fu">sum</span>(TVAL_VEH, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">tveh1_val =</span> <span class="fu">first</span>(TVEH1VAL),</span>
-<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">tveh2_val =</span> <span class="fu">first</span>(TVEH2VAL),</span>
-<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ABAWD flags</span></span>
-<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">has_children =</span> <span class="fu">any</span>(TAGE <span class="sc">&lt;</span> <span class="dv">18</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),      </span>
-<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">youngest_child_age =</span> <span class="cf">if</span> (<span class="fu">any</span>(TAGE <span class="sc">&lt;</span> <span class="dv">26</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) </span>
-<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a>                           <span class="fu">as.numeric</span>(<span class="fu">min</span>(TAGE[TAGE <span class="sc">&lt;</span> <span class="dv">26</span>], <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
-<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a>                         <span class="cf">else</span> <span class="cn">NA_real_</span>,</span>
-<span id="cb16-32"><a href="#cb16-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">has_abawd_age =</span> <span class="fu">any</span>(TAGE <span class="sc">&gt;=</span> <span class="dv">18</span> <span class="sc">&amp;</span> TAGE <span class="sc">&lt;=</span> <span class="dv">49</span> <span class="sc">&amp;</span> <span class="co"># baseline 18-49 flag</span></span>
-<span id="cb16-33"><a href="#cb16-33" aria-hidden="true" tabindex="-1"></a>                       (<span class="fu">is.na</span>(RDIS) <span class="sc">|</span> RDIS <span class="sc">!=</span> <span class="dv">1</span>), <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb16-34"><a href="#cb16-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">has_adult_nondis_50_59 =</span> <span class="fu">any</span>(TAGE <span class="sc">&gt;=</span> <span class="dv">50</span> <span class="sc">&amp;</span> TAGE <span class="sc">&lt;=</span> <span class="dv">59</span> <span class="sc">&amp;</span></span>
-<span id="cb16-35"><a href="#cb16-35" aria-hidden="true" tabindex="-1"></a>                                (<span class="fu">is.na</span>(RDIS) <span class="sc">|</span> RDIS <span class="sc">!=</span> <span class="dv">1</span>), <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb16-36"><a href="#cb16-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">has_adult_nondis_60_65 =</span> <span class="fu">any</span>(TAGE <span class="sc">&gt;=</span> <span class="dv">60</span> <span class="sc">&amp;</span> TAGE <span class="sc">&lt;=</span> <span class="dv">65</span> <span class="sc">&amp;</span></span>
-<span id="cb16-37"><a href="#cb16-37" aria-hidden="true" tabindex="-1"></a>                                (<span class="fu">is.na</span>(RDIS) <span class="sc">|</span> RDIS <span class="sc">!=</span> <span class="dv">1</span>), <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb16-38"><a href="#cb16-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">max_work_hrs =</span> <span class="fu">max</span>(<span class="fu">c</span>(<span class="dv">0</span>, TMWKHRS[TAGE <span class="sc">&gt;=</span> <span class="dv">18</span> <span class="sc">&amp;</span>         </span>
-<span id="cb16-39"><a href="#cb16-39" aria-hidden="true" tabindex="-1"></a>                       (<span class="fu">is.na</span>(RDIS) <span class="sc">|</span> RDIS <span class="sc">!=</span> <span class="dv">1</span>)]), <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb16-40"><a href="#cb16-40" aria-hidden="true" tabindex="-1"></a>    <span class="at">has_any_citizen =</span> <span class="fu">any</span>(ECITIZEN <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="at">na.rm =</span> <span class="cn">TRUE</span>), </span>
-<span id="cb16-41"><a href="#cb16-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">state_fips =</span> <span class="fu">first</span>(TEHC_ST),</span>
-<span id="cb16-42"><a href="#cb16-42" aria-hidden="true" tabindex="-1"></a>    <span class="at">weight =</span> <span class="fu">first</span>(WPFINWGT),</span>
-<span id="cb16-43"><a href="#cb16-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">snap_actual =</span> <span class="fu">any</span>(RSNAP_MNYN <span class="sc">==</span> <span class="dv">1</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb16-44"><a href="#cb16-44" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Aggregation</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>hh_sipp <span class="ot">&lt;-</span> sipp_0719 <span class="sc">|&gt;</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(snap_hhid) <span class="sc">|&gt;</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">hh_size =</span> <span class="fu">n</span>(),</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">has_elderly =</span> <span class="fu">any</span>(TAGE <span class="sc">&gt;=</span> <span class="dv">60</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">has_disabled =</span> <span class="fu">any</span>(RDIS <span class="sc">==</span> <span class="dv">1</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">has_ssi =</span> <span class="fu">all</span>(RSSI_MNYN <span class="sc">==</span> <span class="dv">1</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">has_tanf =</span> <span class="fu">all</span>(RTANF_MNYN <span class="sc">==</span> <span class="dv">1</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Income</span></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">hh_gross_inc =</span> <span class="fu">sum</span>(TPTOTINC, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">*</span> <span class="fl">1.25</span>, <span class="co"># sipp undercounts apply this factor</span></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">hh_earn =</span> <span class="fu">sum</span>(TPEARN, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">*</span> <span class="fl">1.25</span>, <span class="co"># sipp undercounts apply this factor</span></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Deductions</span></span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">child_sup_ded =</span> <span class="fu">sum</span>(TAMOUNTPAID, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">child_care_ded =</span> <span class="fu">sum</span>(TPAYWK, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">*</span> <span class="dv">4</span>,    </span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">medical_costs =</span> <span class="fu">sum</span>(TMDPAY, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Shelter (December of reference year as proxy)</span></span>
+<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">shelter_costs =</span> <span class="fu">coalesce</span>(<span class="fu">first</span>(<span class="fu">na.omit</span>(THVAL_RMU)), <span class="dv">0</span>),</span>
+<span id="cb20-19"><a href="#cb20-19" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Countable assets</span></span>
+<span id="cb20-20"><a href="#cb20-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">countable_assets =</span> <span class="fu">sum</span>(TVAL_BANK, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">+</span> <span class="fu">sum</span>(TVAL_BOND, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
+<span id="cb20-21"><a href="#cb20-21" aria-hidden="true" tabindex="-1"></a>                       <span class="fu">sum</span>(TVAL_BUS,  <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">+</span> <span class="fu">sum</span>(TVAL_STMF, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
+<span id="cb20-22"><a href="#cb20-22" aria-hidden="true" tabindex="-1"></a>                       <span class="fu">sum</span>(TVAL_RENT, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">+</span> <span class="fu">sum</span>(TVAL_RE,   <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
+<span id="cb20-23"><a href="#cb20-23" aria-hidden="true" tabindex="-1"></a>                       <span class="fu">sum</span>(TVAL_OTH,  <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb20-24"><a href="#cb20-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">vehicle_assets =</span> <span class="fu">sum</span>(TVAL_VEH, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">-</span> <span class="dv">4650</span>,</span>
+<span id="cb20-25"><a href="#cb20-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">tveh1_val =</span> <span class="fu">first</span>(TVEH1VAL),</span>
+<span id="cb20-26"><a href="#cb20-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">tveh2_val =</span> <span class="fu">first</span>(TVEH2VAL),</span>
+<span id="cb20-27"><a href="#cb20-27" aria-hidden="true" tabindex="-1"></a>    <span class="co"># ABAWD flags</span></span>
+<span id="cb20-28"><a href="#cb20-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">has_children =</span> <span class="fu">any</span>(TAGE <span class="sc">&lt;</span> <span class="dv">18</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),      </span>
+<span id="cb20-29"><a href="#cb20-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">youngest_child_age =</span> <span class="cf">if</span> (<span class="fu">any</span>(TAGE <span class="sc">&lt;</span> <span class="dv">26</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) </span>
+<span id="cb20-30"><a href="#cb20-30" aria-hidden="true" tabindex="-1"></a>                           <span class="fu">as.numeric</span>(<span class="fu">min</span>(TAGE[TAGE <span class="sc">&lt;</span> <span class="dv">26</span>], <span class="at">na.rm =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb20-31"><a href="#cb20-31" aria-hidden="true" tabindex="-1"></a>                         <span class="cf">else</span> <span class="cn">NA_real_</span>,</span>
+<span id="cb20-32"><a href="#cb20-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">has_abawd_age =</span> <span class="fu">any</span>(TAGE <span class="sc">&gt;=</span> <span class="dv">18</span> <span class="sc">&amp;</span> TAGE <span class="sc">&lt;=</span> <span class="dv">49</span> <span class="sc">&amp;</span> <span class="co"># baseline 18-49 flag</span></span>
+<span id="cb20-33"><a href="#cb20-33" aria-hidden="true" tabindex="-1"></a>                       (<span class="fu">is.na</span>(RDIS) <span class="sc">|</span> RDIS <span class="sc">!=</span> <span class="dv">1</span>), <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb20-34"><a href="#cb20-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">has_adult_nondis_50_59 =</span> <span class="fu">any</span>(TAGE <span class="sc">&gt;=</span> <span class="dv">50</span> <span class="sc">&amp;</span> TAGE <span class="sc">&lt;=</span> <span class="dv">59</span> <span class="sc">&amp;</span></span>
+<span id="cb20-35"><a href="#cb20-35" aria-hidden="true" tabindex="-1"></a>                                (<span class="fu">is.na</span>(RDIS) <span class="sc">|</span> RDIS <span class="sc">!=</span> <span class="dv">1</span>), <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb20-36"><a href="#cb20-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">has_adult_nondis_60_65 =</span> <span class="fu">any</span>(TAGE <span class="sc">&gt;=</span> <span class="dv">60</span> <span class="sc">&amp;</span> TAGE <span class="sc">&lt;=</span> <span class="dv">65</span> <span class="sc">&amp;</span></span>
+<span id="cb20-37"><a href="#cb20-37" aria-hidden="true" tabindex="-1"></a>                                (<span class="fu">is.na</span>(RDIS) <span class="sc">|</span> RDIS <span class="sc">!=</span> <span class="dv">1</span>), <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb20-38"><a href="#cb20-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">max_work_hrs =</span> <span class="fu">max</span>(<span class="fu">c</span>(<span class="dv">0</span>, TMWKHRS[TAGE <span class="sc">&gt;=</span> <span class="dv">18</span> <span class="sc">&amp;</span>         </span>
+<span id="cb20-39"><a href="#cb20-39" aria-hidden="true" tabindex="-1"></a>                       (<span class="fu">is.na</span>(RDIS) <span class="sc">|</span> RDIS <span class="sc">!=</span> <span class="dv">1</span>)]), <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb20-40"><a href="#cb20-40" aria-hidden="true" tabindex="-1"></a>    <span class="at">has_cit_or_elig_noncit =</span> <span class="fu">any</span>(ECITIZEN <span class="sc">==</span> <span class="dv">1</span> <span class="sc">|</span> (TIMSTAT <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> TYRENTRY <span class="sc">&lt;=</span> <span class="dv">2014</span>), <span class="at">na.rm =</span> <span class="cn">TRUE</span>), </span>
+<span id="cb20-41"><a href="#cb20-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">state_fips =</span> <span class="fu">first</span>(TEHC_ST),</span>
+<span id="cb20-42"><a href="#cb20-42" aria-hidden="true" tabindex="-1"></a>    <span class="at">weight =</span> <span class="fu">sum</span>(WPFINWGT),</span>
+<span id="cb20-43"><a href="#cb20-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">snap_actual =</span> <span class="fu">any</span>(RSNAP_MNYN <span class="sc">==</span> <span class="dv">1</span>, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb20-44"><a href="#cb20-44" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="eligibility-function" class="level2">
@@ -3420,179 +3411,268 @@ The following objects are masked from &#39;package:base&#39;:
 <p>State-level BBCE and vehicle rules are looked up internally from <code>snapdb</code> using <code>state_fips</code>. We hardcoded three national or other baseline level policy levers which can then be modified for simulation.</p>
 <p>They are income, asset, and abawd work policy levers.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>snap_elig_sim <span class="ot">&lt;-</span> <span class="cf">function</span>(df,</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Note all of these can be changed as simulations: Income </span></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">gross_pct =</span> <span class="fl">1.30</span>,     <span class="co"># gross income limit as fraction of FPL (federal default: 1.30)</span></span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">net_pct =</span> <span class="fl">1.00</span>,     <span class="co"># net income limit as fraction of FPL   (federal default: 1.00)</span></span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">use_bbce=</span> <span class="cn">TRUE</span>,     <span class="co"># apply state BBCE income extensions</span></span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Asset </span></span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">elim_asset =</span> <span class="cn">FALSE</span>,  <span class="co"># TRUE = no asset test for anyone</span></span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">asset_limit =</span> <span class="cn">NULL</span>,   <span class="co"># set a uniform asset limit in dollars; NULL = federal/BBCE default</span></span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Work </span></span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">work_req =</span> <span class="cn">NULL</span>, <span class="co"># NULL = use state rules; &quot;full_exemption&quot;; &quot;no_exemption&quot;</span></span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">abawd_max_age =</span> <span class="dv">49</span>,   <span class="co"># upper age of ABAWD range (federal default: 49)</span></span>
-<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_work_hrs =</span> <span class="dv">20</span>,   <span class="co"># minimum weekly hours to meet work requirement </span></span>
-<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">dep_age =</span> <span class="dv">18</span>    <span class="co"># child must be under this age to exempt adult from ABAWD </span></span>
-<span id="cb17-14"><a href="#cb17-14" aria-hidden="true" tabindex="-1"></a>) { <span class="fu">with</span>(df, </span>
-<span id="cb17-15"><a href="#cb17-15" aria-hidden="true" tabindex="-1"></a>         {</span>
-<span id="cb17-16"><a href="#cb17-16" aria-hidden="true" tabindex="-1"></a>  <span class="co"># State snap policy</span></span>
-<span id="cb17-17"><a href="#cb17-17" aria-hidden="true" tabindex="-1"></a>  sp <span class="ot">&lt;-</span> snapdb[<span class="fu">match</span>(state_fips, snapdb<span class="sc">$</span>state_fips), ]</span>
-<span id="cb17-18"><a href="#cb17-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-19"><a href="#cb17-19" aria-hidden="true" tabindex="-1"></a>  <span class="co"># FPL thresholds</span></span>
-<span id="cb17-20"><a href="#cb17-20" aria-hidden="true" tabindex="-1"></a>  fpl       <span class="ot">&lt;-</span> <span class="fu">get_fpl</span>(hh_size)</span>
-<span id="cb17-21"><a href="#cb17-21" aria-hidden="true" tabindex="-1"></a>  gross_lmt <span class="ot">&lt;-</span> fpl <span class="sc">*</span> gross_pct</span>
-<span id="cb17-22"><a href="#cb17-22" aria-hidden="true" tabindex="-1"></a>  net_lmt   <span class="ot">&lt;-</span> fpl <span class="sc">*</span> net_pct</span>
-<span id="cb17-23"><a href="#cb17-23" aria-hidden="true" tabindex="-1"></a>  fed_asset_lmt <span class="ot">&lt;-</span> <span class="fu">if_else</span>(has_elderly <span class="sc">|</span> has_disabled, <span class="dv">4500</span>, <span class="dv">3000</span>)</span>
-<span id="cb17-24"><a href="#cb17-24" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(asset_limit)) fed_asset_lmt <span class="ot">&lt;-</span> <span class="fu">rep</span>(asset_limit, <span class="fu">length</span>(hh_size))</span>
-<span id="cb17-25"><a href="#cb17-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-26"><a href="#cb17-26" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Net income calculation</span></span>
-<span id="cb17-27"><a href="#cb17-27" aria-hidden="true" tabindex="-1"></a>  std_ded <span class="ot">&lt;-</span> <span class="fu">get_std_ded</span>(hh_size)</span>
-<span id="cb17-28"><a href="#cb17-28" aria-hidden="true" tabindex="-1"></a>  earn_ded <span class="ot">&lt;-</span> hh_earn <span class="sc">*</span> <span class="fl">0.20</span></span>
-<span id="cb17-29"><a href="#cb17-29" aria-hidden="true" tabindex="-1"></a>  net_pre_shelter <span class="ot">&lt;-</span> <span class="fu">pmax</span>(hh_gross_inc <span class="sc">-</span> std_ded <span class="sc">-</span> earn_ded <span class="sc">-</span> child_sup_ded <span class="sc">-</span> child_care_ded, <span class="dv">0</span>)</span>
-<span id="cb17-30"><a href="#cb17-30" aria-hidden="true" tabindex="-1"></a>  shelter_excess  <span class="ot">&lt;-</span> <span class="fu">pmax</span>(shelter_costs <span class="sc">-</span> <span class="fl">0.50</span> <span class="sc">*</span> net_pre_shelter, <span class="dv">0</span>)</span>
-<span id="cb17-31"><a href="#cb17-31" aria-hidden="true" tabindex="-1"></a>  shelter_ded <span class="ot">&lt;-</span> <span class="fu">if_else</span>(has_elderly <span class="sc">|</span> has_disabled,</span>
-<span id="cb17-32"><a href="#cb17-32" aria-hidden="true" tabindex="-1"></a>                             shelter_excess, <span class="fu">pmin</span>(shelter_excess, shelter_cap))</span>
-<span id="cb17-33"><a href="#cb17-33" aria-hidden="true" tabindex="-1"></a>  medical_ded <span class="ot">&lt;-</span> <span class="fu">if_else</span>(has_elderly <span class="sc">|</span> has_disabled, <span class="fu">pmax</span>(medical_costs <span class="sc">-</span> <span class="dv">35</span>, <span class="dv">0</span>), <span class="dv">0</span>)</span>
-<span id="cb17-34"><a href="#cb17-34" aria-hidden="true" tabindex="-1"></a>  net_inc <span class="ot">&lt;-</span> <span class="fu">pmax</span>(net_pre_shelter <span class="sc">-</span> shelter_ded <span class="sc">-</span> medical_ded, <span class="dv">0</span>)</span>
-<span id="cb17-35"><a href="#cb17-35" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-36"><a href="#cb17-36" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Categorical eligibility (SSI/TANF bypasses income and asset tests)</span></span>
-<span id="cb17-37"><a href="#cb17-37" aria-hidden="true" tabindex="-1"></a>  cat_elig <span class="ot">&lt;-</span> has_ssi <span class="sc">|</span> has_tanf</span>
-<span id="cb17-38"><a href="#cb17-38" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-39"><a href="#cb17-39" aria-hidden="true" tabindex="-1"></a>  <span class="co"># BBCE — look up from state policy; disabled when use_bbce = FALSE</span></span>
-<span id="cb17-40"><a href="#cb17-40" aria-hidden="true" tabindex="-1"></a>  bbce_on <span class="ot">&lt;-</span> use_bbce <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(sp<span class="sc">$</span>bbce) <span class="sc">&amp;</span> sp<span class="sc">$</span>bbce <span class="sc">==</span> <span class="dv">1</span></span>
-<span id="cb17-41"><a href="#cb17-41" aria-hidden="true" tabindex="-1"></a>  bbce_applies <span class="ot">&lt;-</span> bbce_on <span class="sc">&amp;</span> <span class="sc">!</span>(<span class="fu">coalesce</span>(sp<span class="sc">$</span>bbce_child, <span class="dv">0</span>L) <span class="sc">==</span> <span class="dv">1</span>L <span class="sc">&amp;</span> <span class="sc">!</span>has_children)</span>
-<span id="cb17-42"><a href="#cb17-42" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-43"><a href="#cb17-43" aria-hidden="true" tabindex="-1"></a>  gross_lmt_bbce <span class="ot">&lt;-</span> <span class="fu">if_else</span>(bbce_applies <span class="sc">&amp;</span> <span class="fu">coalesce</span>(sp<span class="sc">$</span>bbce_inclmt, <span class="sc">-</span><span class="dv">9</span>L) <span class="sc">&gt;</span> <span class="dv">0</span>,</span>
-<span id="cb17-44"><a href="#cb17-44" aria-hidden="true" tabindex="-1"></a>                             fpl <span class="sc">*</span> (sp<span class="sc">$</span>bbce_inclmt <span class="sc">/</span> <span class="dv">100</span>), gross_lmt)</span>
-<span id="cb17-45"><a href="#cb17-45" aria-hidden="true" tabindex="-1"></a>  gross_lmt_eld <span class="ot">&lt;-</span> <span class="fu">if_else</span>(bbce_applies <span class="sc">&amp;</span> <span class="fu">coalesce</span>(sp<span class="sc">$</span>bbce_elddisinclmt, <span class="sc">-</span><span class="dv">9</span>L) <span class="sc">&gt;</span> <span class="dv">0</span>,</span>
-<span id="cb17-46"><a href="#cb17-46" aria-hidden="true" tabindex="-1"></a>                             fpl <span class="sc">*</span> (sp<span class="sc">$</span>bbce_elddisinclmt <span class="sc">/</span> <span class="dv">100</span>), gross_lmt_bbce)</span>
-<span id="cb17-47"><a href="#cb17-47" aria-hidden="true" tabindex="-1"></a>  gross_lmt_eff <span class="ot">&lt;-</span> <span class="fu">if_else</span>(has_elderly <span class="sc">|</span> has_disabled, gross_lmt_eld, gross_lmt_bbce)</span>
-<span id="cb17-48"><a href="#cb17-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-49"><a href="#cb17-49" aria-hidden="true" tabindex="-1"></a>  asset_test_on <span class="ot">&lt;-</span> <span class="sc">!</span>(bbce_applies <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(sp<span class="sc">$</span>bbce_asset) <span class="sc">&amp;</span> sp<span class="sc">$</span>bbce_asset <span class="sc">==</span> <span class="dv">1</span>)</span>
-<span id="cb17-50"><a href="#cb17-50" aria-hidden="true" tabindex="-1"></a>  asset_lmt_eff <span class="ot">&lt;-</span> <span class="fu">case_when</span>(</span>
-<span id="cb17-51"><a href="#cb17-51" aria-hidden="true" tabindex="-1"></a>    bbce_applies <span class="sc">&amp;</span> <span class="fu">coalesce</span>(sp<span class="sc">$</span>bbce_a_amt, <span class="dv">0</span>) <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">~</span> sp<span class="sc">$</span>bbce_a_amt <span class="sc">*</span> <span class="dv">1000</span>,</span>
-<span id="cb17-52"><a href="#cb17-52" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> fed_asset_lmt</span>
-<span id="cb17-53"><a href="#cb17-53" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb17-54"><a href="#cb17-54" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (elim_asset) asset_test_on <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="cn">FALSE</span>, <span class="fu">length</span>(hh_size))</span>
-<span id="cb17-55"><a href="#cb17-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-56"><a href="#cb17-56" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Vehicle countable value — look up state vehicle exclusion rules</span></span>
-<span id="cb17-57"><a href="#cb17-57" aria-hidden="true" tabindex="-1"></a>  vehicle_countable <span class="ot">&lt;-</span> <span class="fu">case_when</span>(</span>
-<span id="cb17-58"><a href="#cb17-58" aria-hidden="true" tabindex="-1"></a>    sp<span class="sc">$</span>vehexclall <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="dv">0</span>,</span>
-<span id="cb17-59"><a href="#cb17-59" aria-hidden="true" tabindex="-1"></a>    sp<span class="sc">$</span>vehexclone <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="fu">pmax</span>(vehicle_assets <span class="sc">-</span> <span class="fu">coalesce</span>(tveh1_val, <span class="dv">0</span>), <span class="dv">0</span>),</span>
-<span id="cb17-60"><a href="#cb17-60" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> vehicle_assets</span>
-<span id="cb17-61"><a href="#cb17-61" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb17-62"><a href="#cb17-62" aria-hidden="true" tabindex="-1"></a>  net_worth <span class="ot">&lt;-</span> countable_assets <span class="sc">+</span> vehicle_countable</span>
-<span id="cb17-63"><a href="#cb17-63" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-64"><a href="#cb17-64" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Eligibility tests</span></span>
-<span id="cb17-65"><a href="#cb17-65" aria-hidden="true" tabindex="-1"></a>  gross_elig <span class="ot">&lt;-</span> hh_gross_inc <span class="sc">&lt;=</span> gross_lmt_eff</span>
-<span id="cb17-66"><a href="#cb17-66" aria-hidden="true" tabindex="-1"></a>  net_elig   <span class="ot">&lt;-</span> net_inc      <span class="sc">&lt;=</span> net_lmt</span>
-<span id="cb17-67"><a href="#cb17-67" aria-hidden="true" tabindex="-1"></a>  asset_elig <span class="ot">&lt;-</span> <span class="sc">!</span>asset_test_on <span class="sc">|</span> cat_elig <span class="sc">|</span> (net_worth <span class="sc">&lt;=</span> asset_lmt_eff)</span>
-<span id="cb17-68"><a href="#cb17-68" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-69"><a href="#cb17-69" aria-hidden="true" tabindex="-1"></a>  eff_work_req <span class="ot">&lt;-</span> <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(work_req)) <span class="fu">rep</span>(work_req, <span class="fu">length</span>(hh_size)) <span class="cf">else</span> sp<span class="sc">$</span>work_req</span>
-<span id="cb17-70"><a href="#cb17-70" aria-hidden="true" tabindex="-1"></a>  has_abawd_age_eff  <span class="ot">&lt;-</span> has_abawd_age <span class="sc">|</span></span>
-<span id="cb17-71"><a href="#cb17-71" aria-hidden="true" tabindex="-1"></a>                        (abawd_max_age <span class="sc">&gt;=</span> <span class="dv">55</span> <span class="sc">&amp;</span> has_adult_nondis_50_59) <span class="sc">|</span></span>
-<span id="cb17-72"><a href="#cb17-72" aria-hidden="true" tabindex="-1"></a>                        (abawd_max_age <span class="sc">&gt;=</span> <span class="dv">60</span> <span class="sc">&amp;</span> has_adult_nondis_60_65)</span>
-<span id="cb17-73"><a href="#cb17-73" aria-hidden="true" tabindex="-1"></a>  has_qualifying_dep <span class="ot">&lt;-</span> <span class="sc">!</span><span class="fu">is.na</span>(youngest_child_age) <span class="sc">&amp;</span> youngest_child_age <span class="sc">&lt;</span> dep_age</span>
-<span id="cb17-74"><a href="#cb17-74" aria-hidden="true" tabindex="-1"></a>  meets_work_eff <span class="ot">&lt;-</span> max_work_hrs <span class="sc">&gt;=</span> min_work_hrs</span>
-<span id="cb17-75"><a href="#cb17-75" aria-hidden="true" tabindex="-1"></a>  has_abawd <span class="ot">&lt;-</span> has_abawd_age_eff <span class="sc">&amp;</span> <span class="sc">!</span>has_qualifying_dep <span class="sc">&amp;</span> <span class="sc">!</span>has_ssi <span class="sc">&amp;</span> <span class="sc">!</span>has_tanf</span>
-<span id="cb17-76"><a href="#cb17-76" aria-hidden="true" tabindex="-1"></a>  work_elig <span class="ot">&lt;-</span> eff_work_req <span class="sc">==</span> <span class="st">&quot;full_exemption&quot;</span> <span class="sc">|</span> <span class="sc">!</span>has_abawd <span class="sc">|</span> meets_work_eff</span>
-<span id="cb17-77"><a href="#cb17-77" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-78"><a href="#cb17-78" aria-hidden="true" tabindex="-1"></a>  citizen_elig <span class="ot">&lt;-</span> <span class="fu">coalesce</span>(has_any_citizen, <span class="cn">TRUE</span>) <span class="sc">|</span> cat_elig</span>
-<span id="cb17-79"><a href="#cb17-79" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-80"><a href="#cb17-80" aria-hidden="true" tabindex="-1"></a>  (cat_elig <span class="sc">|</span> (gross_elig <span class="sc">&amp;</span> net_elig)) <span class="sc">&amp;</span> asset_elig <span class="sc">&amp;</span> work_elig <span class="sc">&amp;</span> citizen_elig</span>
-<span id="cb17-81"><a href="#cb17-81" aria-hidden="true" tabindex="-1"></a>})}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>snap_elig_sim <span class="ot">&lt;-</span> <span class="cf">function</span>(df,</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Note all of these can be changed as simulations: Income </span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">gross_pct =</span> <span class="fl">1.30</span>,     <span class="co"># gross income limit as fraction of FPL (federal default: 1.30)</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">net_pct =</span> <span class="fl">1.00</span>,     <span class="co"># net income limit as fraction of FPL   (federal default: 1.00)</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">use_bbce=</span> <span class="cn">TRUE</span>,     <span class="co"># apply state BBCE income extensions</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Asset </span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">elim_asset =</span> <span class="cn">FALSE</span>,  <span class="co"># TRUE = no asset test for anyone</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">asset_limit =</span> <span class="cn">NULL</span>,   <span class="co"># set a uniform asset limit in dollars; NULL = federal/BBCE default</span></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Work </span></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">work_req =</span> <span class="cn">NULL</span>, <span class="co"># NULL = use state rules; &quot;full_exemption&quot;; &quot;no_exemption&quot;</span></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">abawd_max_age =</span> <span class="dv">49</span>,   <span class="co"># upper age of ABAWD range (federal default: 49)</span></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">min_work_hrs =</span> <span class="dv">20</span>,   <span class="co"># minimum weekly hours to meet work requirement </span></span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">dep_age =</span> <span class="dv">18</span>    <span class="co"># child must be under this age to exempt adult from ABAWD </span></span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>) { <span class="fu">with</span>(df, </span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>         {</span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>  <span class="co"># State snap policy</span></span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>  sp <span class="ot">&lt;-</span> snapdb[<span class="fu">match</span>(state_fips, snapdb<span class="sc">$</span>state_fips), ]</span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>  <span class="co"># FPL thresholds</span></span>
+<span id="cb21-20"><a href="#cb21-20" aria-hidden="true" tabindex="-1"></a>  fpl       <span class="ot">&lt;-</span> <span class="fu">get_fpl</span>(hh_size)</span>
+<span id="cb21-21"><a href="#cb21-21" aria-hidden="true" tabindex="-1"></a>  gross_lmt <span class="ot">&lt;-</span> fpl <span class="sc">*</span> gross_pct</span>
+<span id="cb21-22"><a href="#cb21-22" aria-hidden="true" tabindex="-1"></a>  net_lmt   <span class="ot">&lt;-</span> fpl <span class="sc">*</span> net_pct</span>
+<span id="cb21-23"><a href="#cb21-23" aria-hidden="true" tabindex="-1"></a>  fed_asset_lmt <span class="ot">&lt;-</span> <span class="fu">if_else</span>(has_elderly <span class="sc">|</span> has_disabled, <span class="dv">3500</span>, <span class="dv">2250</span>)</span>
+<span id="cb21-24"><a href="#cb21-24" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(asset_limit)) fed_asset_lmt <span class="ot">&lt;-</span> <span class="fu">rep</span>(asset_limit, <span class="fu">length</span>(hh_size))</span>
+<span id="cb21-25"><a href="#cb21-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-26"><a href="#cb21-26" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Net income calculation</span></span>
+<span id="cb21-27"><a href="#cb21-27" aria-hidden="true" tabindex="-1"></a>  std_ded <span class="ot">&lt;-</span> <span class="fu">get_std_ded</span>(hh_size)</span>
+<span id="cb21-28"><a href="#cb21-28" aria-hidden="true" tabindex="-1"></a>  earn_ded <span class="ot">&lt;-</span> hh_earn <span class="sc">*</span> <span class="fl">0.20</span></span>
+<span id="cb21-29"><a href="#cb21-29" aria-hidden="true" tabindex="-1"></a>  net_pre_shelter <span class="ot">&lt;-</span> <span class="fu">pmax</span>(hh_gross_inc <span class="sc">-</span> std_ded <span class="sc">-</span> earn_ded <span class="sc">-</span> child_sup_ded <span class="sc">-</span> child_care_ded, <span class="dv">0</span>)</span>
+<span id="cb21-30"><a href="#cb21-30" aria-hidden="true" tabindex="-1"></a>  shelter_excess  <span class="ot">&lt;-</span> <span class="fu">pmax</span>(shelter_costs <span class="sc">-</span> <span class="fl">0.50</span> <span class="sc">*</span> net_pre_shelter, <span class="dv">0</span>)</span>
+<span id="cb21-31"><a href="#cb21-31" aria-hidden="true" tabindex="-1"></a>  shelter_ded <span class="ot">&lt;-</span> <span class="fu">if_else</span>(has_elderly <span class="sc">|</span> has_disabled,</span>
+<span id="cb21-32"><a href="#cb21-32" aria-hidden="true" tabindex="-1"></a>                             shelter_excess, <span class="fu">pmin</span>(shelter_excess, shelter_cap))</span>
+<span id="cb21-33"><a href="#cb21-33" aria-hidden="true" tabindex="-1"></a>  medical_ded <span class="ot">&lt;-</span> <span class="fu">if_else</span>(has_elderly <span class="sc">|</span> has_disabled, <span class="fu">pmax</span>(medical_costs <span class="sc">-</span> <span class="dv">35</span>, <span class="dv">0</span>), <span class="dv">0</span>)</span>
+<span id="cb21-34"><a href="#cb21-34" aria-hidden="true" tabindex="-1"></a>  net_inc <span class="ot">&lt;-</span> <span class="fu">pmax</span>(net_pre_shelter <span class="sc">-</span> shelter_ded <span class="sc">-</span> medical_ded, <span class="dv">0</span>)</span>
+<span id="cb21-35"><a href="#cb21-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-36"><a href="#cb21-36" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Categorical eligibility (SSI/TANF bypasses income and asset tests)</span></span>
+<span id="cb21-37"><a href="#cb21-37" aria-hidden="true" tabindex="-1"></a>  cat_elig <span class="ot">&lt;-</span> has_ssi <span class="sc">|</span> has_tanf</span>
+<span id="cb21-38"><a href="#cb21-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-39"><a href="#cb21-39" aria-hidden="true" tabindex="-1"></a>  <span class="co"># BBCE — look up from state policy; disabled when use_bbce = FALSE</span></span>
+<span id="cb21-40"><a href="#cb21-40" aria-hidden="true" tabindex="-1"></a>  bbce_on <span class="ot">&lt;-</span> use_bbce <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(sp<span class="sc">$</span>bbce) <span class="sc">&amp;</span> sp<span class="sc">$</span>bbce <span class="sc">==</span> <span class="dv">1</span></span>
+<span id="cb21-41"><a href="#cb21-41" aria-hidden="true" tabindex="-1"></a>  bbce_applies <span class="ot">&lt;-</span> bbce_on <span class="sc">&amp;</span> <span class="sc">!</span>(<span class="fu">coalesce</span>(sp<span class="sc">$</span>bbce_child, <span class="dv">0</span>L) <span class="sc">==</span> <span class="dv">1</span>L <span class="sc">&amp;</span> <span class="sc">!</span>has_children)</span>
+<span id="cb21-42"><a href="#cb21-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-43"><a href="#cb21-43" aria-hidden="true" tabindex="-1"></a>  gross_lmt_bbce <span class="ot">&lt;-</span> <span class="fu">if_else</span>(bbce_applies <span class="sc">&amp;</span> <span class="fu">coalesce</span>(sp<span class="sc">$</span>bbce_inclmt, <span class="sc">-</span><span class="dv">9</span>L) <span class="sc">&gt;</span> <span class="dv">0</span>,</span>
+<span id="cb21-44"><a href="#cb21-44" aria-hidden="true" tabindex="-1"></a>                             fpl <span class="sc">*</span> (sp<span class="sc">$</span>bbce_inclmt <span class="sc">/</span> <span class="dv">100</span>), gross_lmt)</span>
+<span id="cb21-45"><a href="#cb21-45" aria-hidden="true" tabindex="-1"></a>  gross_lmt_eld <span class="ot">&lt;-</span> <span class="fu">if_else</span>(bbce_applies <span class="sc">&amp;</span> <span class="fu">coalesce</span>(sp<span class="sc">$</span>bbce_elddisinclmt, <span class="sc">-</span><span class="dv">9</span>L) <span class="sc">&gt;</span> <span class="dv">0</span>,</span>
+<span id="cb21-46"><a href="#cb21-46" aria-hidden="true" tabindex="-1"></a>                             fpl <span class="sc">*</span> (sp<span class="sc">$</span>bbce_elddisinclmt <span class="sc">/</span> <span class="dv">100</span>), gross_lmt_bbce)</span>
+<span id="cb21-47"><a href="#cb21-47" aria-hidden="true" tabindex="-1"></a>  gross_lmt_eff <span class="ot">&lt;-</span> <span class="fu">if_else</span>(has_elderly <span class="sc">|</span> has_disabled, gross_lmt_eld, gross_lmt_bbce)</span>
+<span id="cb21-48"><a href="#cb21-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-49"><a href="#cb21-49" aria-hidden="true" tabindex="-1"></a>  asset_test_on <span class="ot">&lt;-</span> <span class="sc">!</span>(bbce_applies <span class="sc">&amp;</span> <span class="sc">!</span><span class="fu">is.na</span>(sp<span class="sc">$</span>bbce_asset) <span class="sc">&amp;</span> sp<span class="sc">$</span>bbce_asset <span class="sc">==</span> <span class="dv">1</span>)</span>
+<span id="cb21-50"><a href="#cb21-50" aria-hidden="true" tabindex="-1"></a>  asset_lmt_eff <span class="ot">&lt;-</span> <span class="fu">case_when</span>(</span>
+<span id="cb21-51"><a href="#cb21-51" aria-hidden="true" tabindex="-1"></a>    bbce_applies <span class="sc">&amp;</span> <span class="fu">coalesce</span>(sp<span class="sc">$</span>bbce_a_amt, <span class="dv">0</span>) <span class="sc">&gt;</span> <span class="dv">0</span> <span class="sc">~</span> sp<span class="sc">$</span>bbce_a_amt <span class="sc">*</span> <span class="dv">1000</span>,</span>
+<span id="cb21-52"><a href="#cb21-52" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> fed_asset_lmt</span>
+<span id="cb21-53"><a href="#cb21-53" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb21-54"><a href="#cb21-54" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (elim_asset) asset_test_on <span class="ot">&lt;-</span> <span class="fu">rep</span>(<span class="cn">FALSE</span>, <span class="fu">length</span>(hh_size))</span>
+<span id="cb21-55"><a href="#cb21-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-56"><a href="#cb21-56" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Vehicle countable value — look up state vehicle exclusion rules</span></span>
+<span id="cb21-57"><a href="#cb21-57" aria-hidden="true" tabindex="-1"></a>  vehicle_countable <span class="ot">&lt;-</span> <span class="fu">case_when</span>(</span>
+<span id="cb21-58"><a href="#cb21-58" aria-hidden="true" tabindex="-1"></a>    sp<span class="sc">$</span>vehexclall <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="dv">0</span>,</span>
+<span id="cb21-59"><a href="#cb21-59" aria-hidden="true" tabindex="-1"></a>    sp<span class="sc">$</span>vehexclone <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="fu">pmax</span>(vehicle_assets <span class="sc">-</span> <span class="fu">coalesce</span>(tveh1_val, <span class="dv">0</span>), <span class="dv">0</span>),</span>
+<span id="cb21-60"><a href="#cb21-60" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> vehicle_assets</span>
+<span id="cb21-61"><a href="#cb21-61" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb21-62"><a href="#cb21-62" aria-hidden="true" tabindex="-1"></a>  net_worth <span class="ot">&lt;-</span> countable_assets <span class="sc">+</span> vehicle_countable</span>
+<span id="cb21-63"><a href="#cb21-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-64"><a href="#cb21-64" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Eligibility tests</span></span>
+<span id="cb21-65"><a href="#cb21-65" aria-hidden="true" tabindex="-1"></a>  gross_elig <span class="ot">&lt;-</span> (has_elderly <span class="sc">|</span> has_disabled) <span class="sc">|</span> hh_gross_inc <span class="sc">&lt;=</span> gross_lmt_eff</span>
+<span id="cb21-66"><a href="#cb21-66" aria-hidden="true" tabindex="-1"></a>  net_elig   <span class="ot">&lt;-</span> net_inc      <span class="sc">&lt;=</span> net_lmt</span>
+<span id="cb21-67"><a href="#cb21-67" aria-hidden="true" tabindex="-1"></a>  asset_elig <span class="ot">&lt;-</span> <span class="sc">!</span>asset_test_on <span class="sc">|</span> cat_elig <span class="sc">|</span> (net_worth <span class="sc">&lt;=</span> asset_lmt_eff)</span>
+<span id="cb21-68"><a href="#cb21-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-69"><a href="#cb21-69" aria-hidden="true" tabindex="-1"></a>  eff_work_req <span class="ot">&lt;-</span> <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(work_req)) <span class="fu">rep</span>(work_req, <span class="fu">length</span>(hh_size)) <span class="cf">else</span> sp<span class="sc">$</span>work_req</span>
+<span id="cb21-70"><a href="#cb21-70" aria-hidden="true" tabindex="-1"></a>  has_abawd_age_eff  <span class="ot">&lt;-</span> has_abawd_age <span class="sc">|</span></span>
+<span id="cb21-71"><a href="#cb21-71" aria-hidden="true" tabindex="-1"></a>                        (abawd_max_age <span class="sc">&gt;=</span> <span class="dv">55</span> <span class="sc">&amp;</span> has_adult_nondis_50_59) <span class="sc">|</span></span>
+<span id="cb21-72"><a href="#cb21-72" aria-hidden="true" tabindex="-1"></a>                        (abawd_max_age <span class="sc">&gt;=</span> <span class="dv">60</span> <span class="sc">&amp;</span> has_adult_nondis_60_65)</span>
+<span id="cb21-73"><a href="#cb21-73" aria-hidden="true" tabindex="-1"></a>  has_qualifying_dep <span class="ot">&lt;-</span> <span class="sc">!</span><span class="fu">is.na</span>(youngest_child_age) <span class="sc">&amp;</span> youngest_child_age <span class="sc">&lt;</span> dep_age</span>
+<span id="cb21-74"><a href="#cb21-74" aria-hidden="true" tabindex="-1"></a>  meets_work_eff <span class="ot">&lt;-</span> max_work_hrs <span class="sc">&gt;=</span> min_work_hrs</span>
+<span id="cb21-75"><a href="#cb21-75" aria-hidden="true" tabindex="-1"></a>  has_abawd <span class="ot">&lt;-</span> has_abawd_age_eff <span class="sc">&amp;</span> <span class="sc">!</span>has_qualifying_dep <span class="sc">&amp;</span> <span class="sc">!</span>has_ssi <span class="sc">&amp;</span> <span class="sc">!</span>has_tanf</span>
+<span id="cb21-76"><a href="#cb21-76" aria-hidden="true" tabindex="-1"></a>  work_elig <span class="ot">&lt;-</span> eff_work_req <span class="sc">==</span> <span class="st">&quot;full_exemption&quot;</span> <span class="sc">|</span> <span class="sc">!</span>has_abawd <span class="sc">|</span> meets_work_eff</span>
+<span id="cb21-77"><a href="#cb21-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-78"><a href="#cb21-78" aria-hidden="true" tabindex="-1"></a>  citizen_elig <span class="ot">&lt;-</span> <span class="fu">coalesce</span>(has_cit_or_elig_noncit, <span class="cn">TRUE</span>) <span class="sc">|</span> cat_elig</span>
+<span id="cb21-79"><a href="#cb21-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-80"><a href="#cb21-80" aria-hidden="true" tabindex="-1"></a>  (cat_elig <span class="sc">|</span> (gross_elig <span class="sc">&amp;</span> net_elig)) <span class="sc">&amp;</span> asset_elig <span class="sc">&amp;</span> work_elig <span class="sc">&amp;</span> citizen_elig</span>
+<span id="cb21-81"><a href="#cb21-81" aria-hidden="true" tabindex="-1"></a>})}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="scenario-functions" class="level2">
 <h2 class="anchored" data-anchor-id="scenario-functions">Scenario Functions</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>run_scenario <span class="ot">&lt;-</span> <span class="cf">function</span>(data, scenario_name, ...) {</span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  data <span class="sc">|&gt;</span></span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">snap_eligible =</span> <span class="fu">snap_elig_sim</span>(<span class="fu">pick</span>(<span class="fu">everything</span>()), ...),</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>           <span class="at">scenario =</span> scenario_name)</span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>summarize_scenario <span class="ot">&lt;-</span> <span class="cf">function</span>(data) {</span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>  data <span class="sc">|&gt;</span></span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>(</span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">scenario =</span> <span class="fu">first</span>(scenario),</span>
-<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>      <span class="at">n_eligible_weighted =</span> <span class="fu">sum</span>(snap_eligible <span class="sc">*</span> weight, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>      <span class="at">n_total_weighted =</span> <span class="fu">sum</span>(weight, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">pct_eligible=</span> <span class="fu">round</span>(<span class="fu">weighted.mean</span>(snap_eligible, weight, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>))</span>
-<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>run_scenario <span class="ot">&lt;-</span> <span class="cf">function</span>(data, scenario_name, ...) {</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  data <span class="sc">|&gt;</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">snap_eligible =</span> <span class="fu">snap_elig_sim</span>(<span class="fu">pick</span>(<span class="fu">everything</span>()), ...),</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>           <span class="at">scenario =</span> scenario_name)</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>summarize_scenario <span class="ot">&lt;-</span> <span class="cf">function</span>(data) {</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>  data <span class="sc">|&gt;</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>(</span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">scenario =</span> <span class="fu">first</span>(scenario),</span>
+<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>      <span class="at">n_eligible_weighted =</span> <span class="fu">sum</span>(snap_eligible <span class="sc">*</span> weight, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>      <span class="at">n_total_weighted =</span> <span class="fu">sum</span>(weight, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>      <span class="at">pct_eligible=</span> <span class="fu">round</span>(<span class="fu">weighted.mean</span>(snap_eligible, weight, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>))</span>
+<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="run-scenarios" class="level2">
 <h2 class="anchored" data-anchor-id="run-scenarios">Run Scenarios</h2>
 <p>Roughly <a href="https://www.fns.usda.gov/research/snap/state-participation-rates/2019#:~:text=Key%20Findings,Page%20updated:%20April%2018%2C%202025">82% of SNAP eligible households</a> participate in snap in 2019. <a href="https://www.fns.usda.gov/pd/supplemental-nutrition-assistance-program-snap">July 2019 had 19 million households</a>. As such assuming the SIPP properly captures income, asset information, then we should have roughly 23.5 million households.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Baseline: 2019 state rules as-is</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>baseline <span class="ot">&lt;-</span> <span class="fu">run_scenario</span>(hh_sipp, <span class="st">&quot;Baseline (2019)&quot;</span>)</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Income</span></span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>income_200pct  <span class="ot">&lt;-</span> <span class="fu">run_scenario</span>(hh_sipp, <span class="st">&quot;Gross limit 200% FPL&quot;</span>,</span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>                               <span class="at">gross_pct =</span> <span class="fl">2.00</span>)</span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>income_no_bbce <span class="ot">&lt;-</span> <span class="fu">run_scenario</span>(hh_sipp, <span class="st">&quot;Federal rules only (no BBCE)&quot;</span>,</span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>                               <span class="at">use_bbce =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Assets</span></span>
-<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>asset_elim <span class="ot">&lt;-</span> <span class="fu">run_scenario</span>(hh_sipp, <span class="st">&quot;Eliminate asset test&quot;</span>,</span>
-<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>                           <span class="at">elim_asset =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-15"><a href="#cb19-15" aria-hidden="true" tabindex="-1"></a>asset_10k  <span class="ot">&lt;-</span> <span class="fu">run_scenario</span>(hh_sipp, <span class="st">&quot;Raise asset limit to $10k&quot;</span>,</span>
-<span id="cb19-16"><a href="#cb19-16" aria-hidden="true" tabindex="-1"></a>                           <span class="at">asset_limit =</span> <span class="dv">10000</span>)</span>
-<span id="cb19-17"><a href="#cb19-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-18"><a href="#cb19-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Work requirement scenarios </span></span>
-<span id="cb19-19"><a href="#cb19-19" aria-hidden="true" tabindex="-1"></a>work_waive <span class="ot">&lt;-</span> <span class="fu">run_scenario</span>(hh_sipp, <span class="st">&quot;Waive ABAWD nationally&quot;</span>,</span>
-<span id="cb19-20"><a href="#cb19-20" aria-hidden="true" tabindex="-1"></a>                             <span class="at">work_req =</span> <span class="st">&quot;full_exemption&quot;</span>)</span>
-<span id="cb19-21"><a href="#cb19-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-22"><a href="#cb19-22" aria-hidden="true" tabindex="-1"></a>work_enforce <span class="ot">&lt;-</span> <span class="fu">run_scenario</span>(hh_sipp, <span class="st">&quot;Enforce ABAWD nationally&quot;</span>,</span>
-<span id="cb19-23"><a href="#cb19-23" aria-hidden="true" tabindex="-1"></a>                             <span class="at">work_req =</span> <span class="st">&quot;no_exemption&quot;</span>)</span>
-<span id="cb19-24"><a href="#cb19-24" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-25"><a href="#cb19-25" aria-hidden="true" tabindex="-1"></a>work_30hrs <span class="ot">&lt;-</span> <span class="fu">run_scenario</span>(hh_sipp, <span class="st">&quot;30-hour requirement&quot;</span>, <span class="at">min_work_hrs =</span> <span class="dv">30</span>)</span>
-<span id="cb19-26"><a href="#cb19-26" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-27"><a href="#cb19-27" aria-hidden="true" tabindex="-1"></a>work_dep5    <span class="ot">&lt;-</span> <span class="fu">run_scenario</span>(hh_sipp, <span class="st">&quot;Dep age cutoff 5&quot;</span>, <span class="at">dep_age =</span> <span class="dv">5</span>)</span>
-<span id="cb19-28"><a href="#cb19-28" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-29"><a href="#cb19-29" aria-hidden="true" tabindex="-1"></a>work_age65 <span class="ot">&lt;-</span> <span class="fu">run_scenario</span>(hh_sipp, <span class="st">&quot;ABAWD age 18-65&quot;</span>, <span class="at">abawd_max_age =</span> <span class="dv">65</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Baseline: 2019 state rules as-is</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>baseline <span class="ot">&lt;-</span> <span class="fu">run_scenario</span>(hh_sipp, <span class="st">&quot;Baseline (2019)&quot;</span>)</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Income</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>income_200pct  <span class="ot">&lt;-</span> <span class="fu">run_scenario</span>(hh_sipp, <span class="st">&quot;Gross limit 200% FPL&quot;</span>,</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>                               <span class="at">gross_pct =</span> <span class="fl">2.00</span>)</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>income_no_bbce <span class="ot">&lt;-</span> <span class="fu">run_scenario</span>(hh_sipp, <span class="st">&quot;Federal rules only (no BBCE)&quot;</span>,</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>                               <span class="at">use_bbce =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Assets</span></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>asset_elim <span class="ot">&lt;-</span> <span class="fu">run_scenario</span>(hh_sipp, <span class="st">&quot;Eliminate asset test&quot;</span>,</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>                           <span class="at">elim_asset =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>asset_10k  <span class="ot">&lt;-</span> <span class="fu">run_scenario</span>(hh_sipp, <span class="st">&quot;Raise asset limit to $10k&quot;</span>,</span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>                           <span class="at">asset_limit =</span> <span class="dv">10000</span>)</span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Work requirement scenarios </span></span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>work_waive <span class="ot">&lt;-</span> <span class="fu">run_scenario</span>(hh_sipp, <span class="st">&quot;Waive ABAWD nationally&quot;</span>,</span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>                             <span class="at">work_req =</span> <span class="st">&quot;full_exemption&quot;</span>)</span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a>work_enforce <span class="ot">&lt;-</span> <span class="fu">run_scenario</span>(hh_sipp, <span class="st">&quot;Enforce ABAWD nationally&quot;</span>,</span>
+<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a>                             <span class="at">work_req =</span> <span class="st">&quot;no_exemption&quot;</span>)</span>
+<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a>work_30hrs <span class="ot">&lt;-</span> <span class="fu">run_scenario</span>(hh_sipp, <span class="st">&quot;30-hour requirement&quot;</span>, <span class="at">min_work_hrs =</span> <span class="dv">30</span>)</span>
+<span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-27"><a href="#cb23-27" aria-hidden="true" tabindex="-1"></a>work_dep5    <span class="ot">&lt;-</span> <span class="fu">run_scenario</span>(hh_sipp, <span class="st">&quot;Dep age cutoff 5&quot;</span>, <span class="at">dep_age =</span> <span class="dv">5</span>)</span>
+<span id="cb23-28"><a href="#cb23-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-29"><a href="#cb23-29" aria-hidden="true" tabindex="-1"></a>work_age65 <span class="ot">&lt;-</span> <span class="fu">run_scenario</span>(hh_sipp, <span class="st">&quot;ABAWD age 18-65&quot;</span>, <span class="at">abawd_max_age =</span> <span class="dv">65</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="results" class="level2">
 <h2 class="anchored" data-anchor-id="results">Results</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize_scenario</span>(baseline),</span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize_scenario</span>(income_200pct),</span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize_scenario</span>(income_no_bbce),</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize_scenario</span>(asset_elim),</span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize_scenario</span>(asset_10k),</span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize_scenario</span>(work_waive),</span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize_scenario</span>(work_enforce),</span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize_scenario</span>(work_30hrs),</span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize_scenario</span>(work_dep5),</span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize_scenario</span>(work_age65),</span>
-<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">change_from_baseline =</span> n_eligible_weighted <span class="sc">-</span> n_eligible_weighted[scenario <span class="sc">==</span> <span class="st">&quot;Baseline (2019)&quot;</span>],</span>
-<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">pct_change =</span> <span class="fu">round</span>(<span class="dv">100</span> <span class="sc">*</span> change_from_baseline <span class="sc">/</span> n_eligible_weighted[scenario <span class="sc">==</span> <span class="st">&quot;Baseline (2019)&quot;</span>], <span class="dv">1</span>)</span>
-<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-18"><a href="#cb20-18" aria-hidden="true" tabindex="-1"></a>results</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize_scenario</span>(baseline),</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize_scenario</span>(income_200pct),</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize_scenario</span>(income_no_bbce),</span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize_scenario</span>(asset_elim),</span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize_scenario</span>(asset_10k),</span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize_scenario</span>(work_waive),</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize_scenario</span>(work_enforce),</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize_scenario</span>(work_30hrs),</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize_scenario</span>(work_dep5),</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize_scenario</span>(work_age65),</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb24-14"><a href="#cb24-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">change_from_baseline =</span> n_eligible_weighted <span class="sc">-</span> n_eligible_weighted[scenario <span class="sc">==</span> <span class="st">&quot;Baseline (2019)&quot;</span>],</span>
+<span id="cb24-15"><a href="#cb24-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">pct_change =</span> <span class="fu">round</span>(<span class="dv">100</span> <span class="sc">*</span> change_from_baseline <span class="sc">/</span> n_eligible_weighted[scenario <span class="sc">==</span> <span class="st">&quot;Baseline (2019)&quot;</span>], <span class="dv">1</span>)</span>
+<span id="cb24-16"><a href="#cb24-16" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb24-17"><a href="#cb24-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-18"><a href="#cb24-18" aria-hidden="true" tabindex="-1"></a>results</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 10 × 6
    scenario                    n_eligible_weighted n_total_weighted pct_eligible
    &lt;chr&gt;                                     &lt;dbl&gt;            &lt;dbl&gt;        &lt;dbl&gt;
- 1 Baseline (2019)                       24141298.       137229283.         17.6
- 2 Gross limit 200% FPL                  24482805.       137229283.         17.8
- 3 Federal rules only (no BBC…           17855722.       137229283.         13  
- 4 Eliminate asset test                  25708851.       137229283.         18.7
- 5 Raise asset limit to $10k             24247448.       137229283.         17.7
- 6 Waive ABAWD nationally                27649601.       137229283.         20.1
- 7 Enforce ABAWD nationally              24018271.       137229283.         17.5
- 8 30-hour requirement                   23637807.       137229283.         17.2
- 9 Dep age cutoff 5                      23320492.       137229283.         17  
-10 ABAWD age 18-65                       22727405.       137229283.         16.6
+ 1 Baseline (2019)                       59711540.       322957232.         18.5
+ 2 Gross limit 200% FPL                  60038475.       322957232.         18.6
+ 3 Federal rules only (no BBC…           37732168.       322957232.         11.7
+ 4 Eliminate asset test                  67680725.       322957232.         21  
+ 5 Raise asset limit to $10k             60294297.       322957232.         18.7
+ 6 Waive ABAWD nationally                64601780.       322957232.         20  
+ 7 Enforce ABAWD nationally              59557304.       322957232.         18.4
+ 8 30-hour requirement                   58893532.       322957232.         18.2
+ 9 Dep age cutoff 5                      54605703.       322957232.         16.9
+10 ABAWD age 18-65                       56789136.       322957232.         17.6
+# ℹ 2 more variables: change_from_baseline &lt;dbl&gt;, pct_change &lt;dbl&gt;</code></pre>
+</div>
+</div>
+<p>State-level eligibility rates.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>summarize_by_state <span class="ot">&lt;-</span> <span class="cf">function</span>(data) {</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  data <span class="sc">|&gt;</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(state_fips, scenario) <span class="sc">|&gt;</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarize</span>(</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">n_eligible_weighted =</span> <span class="fu">sum</span>(snap_eligible <span class="sc">*</span> weight, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">n_total_weighted    =</span> <span class="fu">sum</span>(weight, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>      <span class="at">pct_eligible        =</span> <span class="fu">round</span>(<span class="fu">weighted.mean</span>(snap_eligible, weight, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">*</span> <span class="dv">100</span>, <span class="dv">1</span>),</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span></span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Baseline</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>baseline_state <span class="ot">&lt;-</span> hh_sipp <span class="sc">|&gt;</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">run_scenario</span>(<span class="st">&quot;Baseline&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize_by_state</span>()</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Income</span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>twohundred_state  <span class="ot">&lt;-</span> hh_sipp <span class="sc">|&gt;</span></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">run_scenario</span>(<span class="st">&quot;Gross limit 200% FPL&quot;</span>, <span class="at">gross_pct =</span> <span class="fl">2.00</span>) <span class="sc">|&gt;</span></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize_by_state</span>()</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>no_bbce_state <span class="ot">&lt;-</span> hh_sipp <span class="sc">|&gt;</span></span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">run_scenario</span>(<span class="st">&quot;Federal rules only (no BBCE)&quot;</span>, <span class="at">use_bbce =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize_by_state</span>()</span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Assets</span></span>
+<span id="cb27-16"><a href="#cb27-16" aria-hidden="true" tabindex="-1"></a>asset_elim_state <span class="ot">&lt;-</span> hh_sipp <span class="sc">|&gt;</span></span>
+<span id="cb27-17"><a href="#cb27-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">run_scenario</span>(<span class="st">&quot;Eliminate asset test&quot;</span>, <span class="at">elim_asset =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb27-18"><a href="#cb27-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize_by_state</span>()</span>
+<span id="cb27-19"><a href="#cb27-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-20"><a href="#cb27-20" aria-hidden="true" tabindex="-1"></a>asset_10k_state  <span class="ot">&lt;-</span> hh_sipp <span class="sc">|&gt;</span></span>
+<span id="cb27-21"><a href="#cb27-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">run_scenario</span>(<span class="st">&quot;Raise asset limit to $10k&quot;</span>, <span class="at">asset_limit =</span> <span class="dv">10000</span>) <span class="sc">|&gt;</span></span>
+<span id="cb27-22"><a href="#cb27-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize_by_state</span>()</span>
+<span id="cb27-23"><a href="#cb27-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-24"><a href="#cb27-24" aria-hidden="true" tabindex="-1"></a><span class="co"># Work requirement scenarios </span></span>
+<span id="cb27-25"><a href="#cb27-25" aria-hidden="true" tabindex="-1"></a>work_waive_state <span class="ot">&lt;-</span> hh_sipp <span class="sc">|&gt;</span></span>
+<span id="cb27-26"><a href="#cb27-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">run_scenario</span>(<span class="st">&quot;Waive ABAWD nationally&quot;</span>, <span class="at">work_req =</span> <span class="st">&quot;full_exemption&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb27-27"><a href="#cb27-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize_by_state</span>()</span>
+<span id="cb27-28"><a href="#cb27-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-29"><a href="#cb27-29" aria-hidden="true" tabindex="-1"></a>work_enforce_state <span class="ot">&lt;-</span> hh_sipp <span class="sc">|&gt;</span></span>
+<span id="cb27-30"><a href="#cb27-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">run_scenario</span>(<span class="st">&quot;Enforce ABAWD nationally&quot;</span>, <span class="at">work_req =</span> <span class="st">&quot;no_exemption&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb27-31"><a href="#cb27-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize_by_state</span>()</span>
+<span id="cb27-32"><a href="#cb27-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-33"><a href="#cb27-33" aria-hidden="true" tabindex="-1"></a>work_30hrs_state <span class="ot">&lt;-</span> hh_sipp <span class="sc">|&gt;</span></span>
+<span id="cb27-34"><a href="#cb27-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">run_scenario</span>(<span class="st">&quot;30-hour requirement&quot;</span>, <span class="at">min_work_hrs =</span> <span class="dv">30</span>) <span class="sc">|&gt;</span></span>
+<span id="cb27-35"><a href="#cb27-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize_by_state</span>()</span>
+<span id="cb27-36"><a href="#cb27-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-37"><a href="#cb27-37" aria-hidden="true" tabindex="-1"></a>work_dep5_state <span class="ot">&lt;-</span> hh_sipp <span class="sc">|&gt;</span></span>
+<span id="cb27-38"><a href="#cb27-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">run_scenario</span>(<span class="st">&quot;Dep age cutoff 5&quot;</span>, <span class="at">dep_age =</span> <span class="dv">5</span>) <span class="sc">|&gt;</span></span>
+<span id="cb27-39"><a href="#cb27-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize_by_state</span>()</span>
+<span id="cb27-40"><a href="#cb27-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-41"><a href="#cb27-41" aria-hidden="true" tabindex="-1"></a>work_age65_state <span class="ot">&lt;-</span> hh_sipp <span class="sc">|&gt;</span></span>
+<span id="cb27-42"><a href="#cb27-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">run_scenario</span>(<span class="st">&quot;ABAWD age 18-65&quot;</span>, <span class="at">abawd_max_age =</span> <span class="dv">65</span>) <span class="sc">|&gt;</span></span>
+<span id="cb27-43"><a href="#cb27-43" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize_by_state</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>state_results <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(baseline_state, twohundred_state,</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>                           no_bbce_state, asset_elim_state, asset_10k_state,</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>                           work_waive_state, work_enforce_state, work_30hrs_state,</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>                           work_dep5_state, work_age65_state) <span class="sc">|&gt;</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(state_fips) <span class="sc">|&gt;</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">change_from_baseline =</span> n_eligible_weighted <span class="sc">-</span> n_eligible_weighted[scenario <span class="sc">==</span> <span class="st">&quot;Baseline&quot;</span>],</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">pct_change =</span> <span class="fu">round</span>(<span class="dv">100</span> <span class="sc">*</span> change_from_baseline <span class="sc">/</span> n_eligible_weighted[scenario <span class="sc">==</span> <span class="st">&quot;Baseline&quot;</span>],</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>                            <span class="dv">1</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(state_fips, scenario)</span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>state_results</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 510 × 7
+   state_fips scenario         n_eligible_weighted n_total_weighted pct_eligible
+        &lt;int&gt; &lt;chr&gt;                          &lt;dbl&gt;            &lt;dbl&gt;        &lt;dbl&gt;
+ 1          1 30-hour require…            1206103.         4850175.         24.9
+ 2          1 ABAWD age 18-65             1136194.         4850175.         23.4
+ 3          1 Baseline                    1220296.         4850175.         25.2
+ 4          1 Dep age cutoff 5            1158246.         4850175.         23.9
+ 5          1 Eliminate asset…            1220296.         4850175.         25.2
+ 6          1 Enforce ABAWD n…            1220296.         4850175.         25.2
+ 7          1 Federal rules o…             853874.         4850175.         17.6
+ 8          1 Gross limit 200…            1220296.         4850175.         25.2
+ 9          1 Raise asset lim…            1220296.         4850175.         25.2
+10          1 Waive ABAWD nat…            1360290.         4850175.         28  
+# ℹ 500 more rows
 # ℹ 2 more variables: change_from_baseline &lt;dbl&gt;, pct_change &lt;dbl&gt;</code></pre>
 </div>
 </div>

@@ -408,3 +408,79 @@ results <- bind_rows(
 
 results
 ```
+
+State-level eligibility rates.
+
+```{r}
+summarize_by_state <- function(data) {
+  data |>
+    group_by(state_fips, scenario) |>
+    summarize(
+      n_eligible_weighted = sum(snap_eligible * weight, na.rm = TRUE),
+      n_total_weighted    = sum(weight, na.rm = TRUE),
+      pct_eligible        = round(weighted.mean(snap_eligible, weight, na.rm = TRUE) * 100, 1),
+      .groups = "drop"
+    )
+}
+```
+
+```{r}
+# Baseline
+baseline_state <- hh_sipp |>
+  run_scenario("Baseline") |>
+  summarize_by_state()
+
+# Income
+twohundred_state  <- hh_sipp |>
+  run_scenario("Gross limit 200% FPL", gross_pct = 2.00) |>
+  summarize_by_state()
+
+no_bbce_state <- hh_sipp |>
+  run_scenario("Federal rules only (no BBCE)", use_bbce = FALSE) |>
+  summarize_by_state()
+
+# Assets
+asset_elim_state <- hh_sipp |>
+  run_scenario("Eliminate asset test", elim_asset = TRUE) |>
+  summarize_by_state()
+
+asset_10k_state  <- hh_sipp |>
+  run_scenario("Raise asset limit to $10k", asset_limit = 10000) |>
+  summarize_by_state()
+
+# Work requirement scenarios 
+work_waive_state <- hh_sipp |>
+  run_scenario("Waive ABAWD nationally", work_req = "full_exemption") |>
+  summarize_by_state()
+
+work_enforce_state <- hh_sipp |>
+  run_scenario("Enforce ABAWD nationally", work_req = "no_exemption") |>
+  summarize_by_state()
+
+work_30hrs_state <- hh_sipp |>
+  run_scenario("30-hour requirement", min_work_hrs = 30) |>
+  summarize_by_state()
+
+work_dep5_state <- hh_sipp |>
+  run_scenario("Dep age cutoff 5", dep_age = 5) |>
+  summarize_by_state()
+
+work_age65_state <- hh_sipp |>
+  run_scenario("ABAWD age 18-65", abawd_max_age = 65) |>
+  summarize_by_state()
+```
+
+```{r}
+state_results <- bind_rows(baseline_state, twohundred_state,
+                           no_bbce_state, asset_elim_state, asset_10k_state,
+                           work_waive_state, work_enforce_state, work_30hrs_state,
+                           work_dep5_state, work_age65_state) |>
+  group_by(state_fips) |>
+  mutate(change_from_baseline = n_eligible_weighted - n_eligible_weighted[scenario == "Baseline"],
+         pct_change = round(100 * change_from_baseline / n_eligible_weighted[scenario == "Baseline"],
+                            1)) |>
+  ungroup() |>
+  arrange(state_fips, scenario)
+
+state_results
+```
