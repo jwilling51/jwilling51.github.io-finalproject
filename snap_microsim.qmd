@@ -68,7 +68,13 @@ snapdb <- snapdb |>
 ```
 
 ## Load SIPP 2019
-The core dataset for our microsimulation comes from the Survey of Income and Program Participation (SIPP), a longitudinal panel survey of US households that contains rich data on income, assets, and participation in public programs. We use data from 2019, which includes the 2018 and 2019 SIPP panels, available from the [Census website](https://www.census.gov/programs-surveys/sipp/data/datasets/2019-data/2019.html).
+
+The core dataset for our microsimulation comes from the Survey of Income
+and Program Participation (SIPP), a longitudinal panel survey of US
+households that contains rich data on income, assets, and participation
+in public programs. We use data from 2019, which includes the 2018 and
+2019 SIPP panels, available from the [Census
+website](https://www.census.gov/programs-surveys/sipp/data/datasets/2019-data/2019.html).
 
 ```{r}
 #| cache: false
@@ -137,7 +143,12 @@ sipp2019 <- left_join(pu, rw, by = c("SSUID", "PNUM", "MONTHCODE"))
 
 ## Filter to July 2019 and generate new SNAP unit ID
 
-Households are uniquely identified in the SIPP by SSUID and SHHADID, but some households may contain multiple SNAP units, defined as people who live and purchase food together. The SIPP does not directly ask about this, but we approximate it based on household relationships. We assume that family members and partners living together are part of the same SNAP unit, while roommates/boarders/other non-family members are not.
+Households are uniquely identified in the SIPP by SSUID and SHHADID, but
+some households may contain multiple SNAP units, defined as people who
+live and purchase food together. The SIPP does not directly ask about
+this, but we approximate it based on household relationships. We assume
+that family members and partners living together are part of the same
+SNAP unit, while roommates/boarders/other non-family members are not.
 
 ```{r}
 sipp_0719 <- sipp2019 |>
@@ -976,6 +987,9 @@ state_results
 # Visualize State Level Results
 
 ```{r}
+#| warning: false
+#| message: false
+
 visualize_scenario <- function(df, scen) {
   # State geometry from tigris
   states <- states(cb = TRUE, resolution = "20m") |>
