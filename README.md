@@ -4,7 +4,7 @@
 
 The One Big Beautiful Bill Act made major changes to the Supplemental Nutritional Assistance Program (SNAP), including expanding work requirements for adults aged 18-64, restricting eligibility for noncitizens, and increasing paperwork and reporting requirements for recipients. These changes have major implications for low-income individuals experiencing food insecurity, and for the over 22 million households receiving SNAP. Our motivating question: How do changes to SNAP eligibility requirements, such as income/ asset thresholds and work requirements, affect the size of the eligible population across states?
 
-This repository seeks to answer this question and is organized under this html: 
+This repository seeks to answer this question and can be found here: 
 
 [Main Analysis (includes our methods and results)](snap_microsim.html) 
 
