@@ -856,8 +856,7 @@ bind_rows(
   summarize_scenario(obbba_simulation)) |>
   ggplot(aes(reorder(scenario, pct_eligible), pct_eligible)) +
   geom_col() +
-  geom_text(aes(label = paste0(pct_eligible, "%")), hjust = -0.1) +
-  coord_flip() +
+  geom_text(aes(label = paste0(pct_eligible, "%")), vjust = -0.5) +
   scale_y_continuous(
     expand = expansion(mult = c(0, 0.15)),
     labels = scales::label_percent(scale = 1)) +
