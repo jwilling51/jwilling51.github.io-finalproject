@@ -681,6 +681,19 @@ results |>
   theme_minimal()
 ```
 
+For baseline eligibility in July 2019, we estimate that approximately 26
+million households are eligible for SNAP. This is similar to the 23.5
+million that we expected. Adjusting the gross income limit to 200% of
+the FPL minimally increases the number of eligible households by 0.5
+percent from baseline, while enforcing ABAWD nationally decreases the
+eligibility rate by 0.5 percent. The greatest estimated changed from
+baseline is eliminating categorical eligibility and applying only
+federal eligibility rules nationally. We estimate that the number of
+eligible households would decrease to about 17 million households, a
+decrease of 35.4 percent. Eliminating the asset test and waiving ABAWD
+nationally are both estimated to increase eligibility rates by about 13
+percent, to about 29.6 million eligible households.
+
 ### Baseline Income Distribution of SNAP eligibility
 
 **Income Decile:**
@@ -882,22 +895,7 @@ bind_rows(
   theme_minimal()
 ```
 
-## State-level eligibility estimations
-
-For baseline eligibility in July 2019, we estimate that approximately 26
-million households are eligible for SNAP. This is similar to the 23.5
-million that we expected. Adjusting the gross income limit to 200% of
-the FPL minimally increases the number of eligible households by 0.5
-percent from baseline, while enforcing ABAWD nationally decreases the
-eligibility rate by 0.5 percent. The greatest estimated changed from
-baseline is eliminating categorical eligibility and applying only
-federal eligibility rules nationally. We estimate that the number of
-eligible households would decrease to about 17 million households, a
-decrease of 35.4 percent. Eliminating the asset test and waiving ABAWD
-nationally are both estimated to increase eligibility rates by about 13
-percent, to about 29.6 million eligible households.
-
-### State-level results
+## State-level eligibility results
 
 Because states have different baseline eligibility rates, and baseline
 SNAP eligibility rules, we are also interested in summarizing how these
@@ -1065,6 +1063,8 @@ visualize_scenario <- function(df, scen) {
 ```{r}
 #| results: 'hide'
 
+#| warning: false
+#| message: false
 visualize_scenario(state_results, scen = "Baseline")
 
 visualize_scenario(state_results, scen = "Gross limit 200% FPL")
