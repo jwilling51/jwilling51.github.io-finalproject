@@ -6,7 +6,7 @@ The One Big Beautiful Bill Act made major changes to the Supplemental Nutritiona
 
 This repository seeks to answer this question and can be found here: 
 
-[Main Analysis (includes our methods and results)](snap_microsim.html) 
+[Main Analysis (includes our methods and results)](https://jwilling51.github.io/jwilling51.github.io-finalproject/snap_microsim.html)
 
 For our data, we use the Survey of Income and Program Participation (SIPP)’s data from July 2019, since SNAP eligibility rules have changed over time. We selected 2019 because it was the last year where data about eligibility requirements is available in the SNAP Policy Database. After merging the SNAP Policy Database to the SIPP’s July 2019 data, we aggregated to the SNAP household level. SNAP filing units live and purchase food together, but since SIPP does not track this exact information, we define a SNAP household in the SIPP to include family members and partners living together, while roommates/boarders/other non-family members are not. Then, we created a SNAP eligibility microsimulation that simulates how eligibility rates change based on different income, asset, and ABAWD work requirement policy levers. 
 
