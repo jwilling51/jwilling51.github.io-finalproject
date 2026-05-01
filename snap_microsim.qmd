@@ -7,6 +7,9 @@ format:
 editor:
   markdown:
     wrap: 72
+execute:
+  cache: true
+  cache.lazy: false
 bibliography: references.bib
 ---
 
@@ -647,6 +650,22 @@ results <- bind_rows(
 results
 ```
 
+```{r}
+results |>
+  ggplot(aes(reorder(scenario, pct_eligible), pct_eligible)) +
+  geom_col() +
+  geom_text(aes(label = paste0(pct_eligible, "%")), hjust = -0.1) +
+  coord_flip() +
+  scale_y_continuous(
+    expand = expansion(mult = c(0, 0.15)),
+    labels = scales::label_percent(scale = 1)) +
+  labs(
+    title = "SNAP Eligibility Rate by Policy Scenario",
+    x = NULL,
+    y = "% Eligible") +
+  theme_minimal()
+```
+
 ### Baseline Income Distribution of SNAP eligibility
 
 **Income Decile:**
@@ -743,13 +762,11 @@ bind_rows(baseline, income_200pct, income_no_bbce, asset_elim, asset_10k,
   coord_flip() +
   scale_y_continuous(
     expand = expansion(mult = c(0, 0.15)),
-    labels = scales::label_percent(scale = 1)
-  ) +
+    labels = scales::label_percent(scale = 1)) +
   labs(
     title = "SNAP Eligibility in Bottom Income Quartile by Scenario",
-    x     = NULL,
-    y     = "% Eligible"
-  ) +
+    x = NULL,
+    y = "% Eligible") +
   theme_minimal()
 ```
 
@@ -762,21 +779,18 @@ bind_rows(baseline, income_200pct, income_no_bbce, asset_elim, asset_10k,
   mutate(inc_quartile = ntile(hh_gross_inc, n = 4)) |>
   filter(inc_quartile == 2) |>
   summarize(
-    pct_eligible = round(weighted.mean(snap_eligible, weight, na.rm = TRUE) * 100, 1)
-  ) |>
+    pct_eligible = round(weighted.mean(snap_eligible, weight, na.rm = TRUE) * 100, 1)) |>
   ggplot(aes(reorder(scenario, pct_eligible), pct_eligible)) +
   geom_col() +
   geom_text(aes(label = paste0(pct_eligible, "%")), hjust = -0.1) +
   coord_flip() +
   scale_y_continuous(
     expand = expansion(mult = c(0, 0.15)),
-    labels = scales::label_percent(scale = 1)
-  ) +
+    labels = scales::label_percent(scale = 1)) +
   labs(
     title = "SNAP Eligibility in Second Income Quartile by Scenario",
-    x     = NULL,
-    y     = "% Eligible"
-  ) +
+    x = NULL,
+    y = "% Eligible") +
   theme_minimal()
 ```
 
@@ -785,11 +799,74 @@ Across the bottom half of the income distribution patterns emerge:
 1.  BBCE helps ensure lower income families can have access to food
     assistance and are the single biggest driver SNAP participation in
     our models.
-2.  OBBBA style reforms (ABAWD work requierements) are the most
+2.  OBBBA style reforms (ABAWD work requirements) are the most
     regressive and lower families SNAP eligibility across the board.
     1.  **In the lowest quartile simply expanding the ABAWD age range
         from up to 49 to 65 means 5% of families in the lowest quartile
         lose SNAP.**
+
+**We can also just for the sake of depth look at the distributions for
+each policy by quartile**
+
+```{r}
+bind_rows(baseline, income_200pct, income_no_bbce, asset_elim, asset_10k,
+          work_waive, work_enforce, work_30hrs, work_dep5, work_age65) |>
+  group_by(scenario) |>
+  mutate(inc_quartile = ntile(hh_gross_inc, n = 4)) |>
+  group_by(scenario, inc_quartile) |>
+  summarize(
+    pct_eligible = round(weighted.mean(snap_eligible, weight, na.rm = TRUE) * 100, 1),
+    .groups = "drop") |>
+  ggplot(aes(x = factor(inc_quartile), y = reorder(scenario, pct_eligible), fill = pct_eligible)) +
+  geom_tile(color = "white") +
+  geom_text(aes(label = paste0(pct_eligible, "%")), size = 3.2) +
+  scale_fill_gradient(low = "white", high = "#2166ac",
+                      name = "% Eligible") +
+  labs(
+    title = "SNAP Eligibility Rate by Income Quartile and Scenario",
+    x = "Income Quartile",
+    y = NULL
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(panel.grid = element_blank())
+```
+
+This generally doesn't reveal anything too stark about SNAP however it
+does indicate that BBCE policies also affect those who aren't
+necessarily in the bottom half of the distribution.
+
+### Pseudo OBBBA ABAWD Work Requirement Simulation
+
+All of the prior simulations only toggle one scenario at a time.
+However, if we edit the scenarios by raising the age of exemption to 65
+and edit the dependent child clause to not exempt families where the
+youngest child is over 14 then we can somewhat model OBBBA. We can't
+necessarily cover some of the provisions like stricter work waivers or
+cost share behavorial responses however.
+
+```{r}
+obbba_simulation <- run_scenario(hh_sipp, "OBBBA (approx.)",
+                                 abawd_max_age = 65,
+                                 dep_age = 14)
+```
+
+```{r}
+bind_rows(
+  summarize_scenario(baseline),
+  summarize_scenario(obbba_simulation)) |>
+  ggplot(aes(reorder(scenario, pct_eligible), pct_eligible)) +
+  geom_col() +
+  geom_text(aes(label = paste0(pct_eligible, "%")), hjust = -0.1) +
+  coord_flip() +
+  scale_y_continuous(
+    expand = expansion(mult = c(0, 0.15)),
+    labels = scales::label_percent(scale = 1)) +
+  labs(
+    title = "SNAP Eligibility: Baseline vs. OBBBA Work Requirement Changes",
+    x = NULL,
+    y = "% Eligible") +
+  theme_minimal()
+```
 
 ## State-level eligibility estimations
 
