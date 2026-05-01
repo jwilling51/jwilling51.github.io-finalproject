@@ -27,6 +27,10 @@ library(readxl)
 library(data.table)
 library(bit64)
 library(skimr)
+library(sf)
+library(tigris)
+library(scales)
+library(ggrepel)
 ```
 
 ## Load SNAP Policy Database
@@ -243,7 +247,7 @@ hh_sipp <- sipp_0719 |>
                        (is.na(RDIS) | RDIS != 1)]), na.rm = TRUE),
     has_cit_or_elig_noncit = any(ECITIZEN == 1 | (TIMSTAT == 1 & TYRENTRY <= 2014), na.rm = TRUE), 
     state_fips = first(TEHC_ST),
-    weight = first(WPFINWGT[ERELRPE == min(ERELRPE)]),
+    weight = first(WPFINWGT[!is.na(ERELRPE) & ERELRPE == min(ERELRPE, na.rm = TRUE)]),
     snap_actual = any(RSNAP_MNYN == 1, na.rm = TRUE)
   )
 ```
@@ -361,7 +365,7 @@ summarize_scenario <- function(data) {
 }
 ```
 
-## Run Scenarios
+## Run Scenarios at National Level
 
 Roughly [82% of SNAP eligible
 households](https://www.fns.usda.gov/research/snap/state-participation-rates/2019#:~:text=Key%20Findings,Page%20updated:%20April%2018%2C%202025)
@@ -402,7 +406,7 @@ work_dep5    <- run_scenario(hh_sipp, "Dep age cutoff 5", dep_age = 5)
 work_age65 <- run_scenario(hh_sipp, "ABAWD age 18-65", abawd_max_age = 65)
 ```
 
-## Results
+## National Results
 
 ```{r}
 results <- bind_rows(
@@ -425,7 +429,7 @@ results <- bind_rows(
 results
 ```
 
-State-level eligibility rates.
+## Run Scenarios at the State Level
 
 ```{r}
 summarize_by_state <- function(data) {
@@ -486,6 +490,8 @@ work_age65_state <- hh_sipp |>
   summarize_by_state()
 ```
 
+## State Level Results
+
 ```{r}
 state_results <- bind_rows(baseline_state, twohundred_state,
                            no_bbce_state, asset_elim_state, asset_10k_state,
@@ -499,4 +505,106 @@ state_results <- bind_rows(baseline_state, twohundred_state,
   arrange(state_fips)
 
 state_results
+```
+
+# Visualize State Level Results
+
+```{r}
+visualize_scenario <- function(df, scen) {
+  # State geometry from tigris
+  states <- states(cb = TRUE, resolution = "20m") |>
+    st_transform(5070) |>
+    shift_geometry()
+  
+  # Separate out small states that will need custom labels
+  small_states <- c("VT","NH","MA","RI","CT","NJ","DE","MD","DC")
+  
+  # Merge state geometry with eligibility microsim data
+  plot_data <- df |> 
+    filter(scenario == scen) |>
+    mutate(STATEFP = str_pad(state_fips, width = 2, side = "left", pad = "0")) |>
+    left_join(states, by = "STATEFP") |>
+    st_as_sf() |>
+    mutate(is_small = STUSPS %in% small_states)
+  
+  # Label positions and table for small states
+  centroids <- st_centroid(plot_data)
+  
+  coords <- centroids %>%
+    mutate(
+      x = st_coordinates(.)[,1],
+      y = st_coordinates(.)[,2]
+    ) %>%
+    st_drop_geometry()
+  
+  table_positions <- coords |>
+    filter(is_small) |>
+    arrange(desc(y)) |> 
+    mutate(
+      table_x = max(coords$x) + 6e5,
+      table_y = seq(max(coords$y), length.out = n(), by = -2e5)
+    )
+  
+  coords <- coords |>
+    left_join(table_positions |> select(STUSPS, table_x, table_y), by = "STUSPS")
+  
+  # Make plot
+  ggplot(plot_data) +
+    geom_sf(aes(fill = pct_eligible), color = "white") +
+    # Labels for large states
+    geom_text(
+      data = coords |> filter(!is_small),
+      aes(x = x, y = y, label = pct_eligible),
+      size = 3
+    ) +
+    # Segments for small states
+    geom_segment(
+      data = coords |> filter(is_small),
+      aes(x = x, y = y, xend = table_x, yend = table_y),
+      color = "gray50"
+    ) +
+    # Separate labels for small states
+    geom_text(
+      data = coords |> filter(is_small),
+      aes(x = table_x, y = table_y, 
+          label = paste0(STUSPS, ": ", pct_eligible)),
+      hjust = 0,
+      size = 3
+    ) +
+    scale_fill_gradient(low = "#BAE1FF", high = "#0B538A") +
+    coord_sf(clip = "off") +
+    labs(title = scen, fill = "Percent of households SNAP eligible") +
+    theme_void() +
+    theme(
+      plot.title = element_text(hjust = 0.5),
+      plot.margin = margin(10, 100, 10, 10),
+      legend.position = "bottom"
+    )
+    
+}
+
+
+```
+
+```{r}
+visualize_scenario(state_results, scen = "Baseline")
+
+visualize_scenario(state_results, scen = "Gross limit 200% FPL")
+
+visualize_scenario(state_results, scen = "Federal rules only (no BBCE)")
+
+visualize_scenario(state_results, scen = "Eliminate asset test")
+
+visualize_scenario(state_results, scen = "Raise asset limit to $10k")
+
+visualize_scenario(state_results, scen = "Waive ABAWD nationally")
+
+visualize_scenario(state_results, scen = "Enforce ABAWD nationally")
+
+visualize_scenario(state_results, scen = "30-hour requirement")
+
+visualize_scenario(state_results, scen = "Dep age cutoff 5")
+
+visualize_scenario(state_results, scen = "ABAWD age 18-65")
+
 ```
