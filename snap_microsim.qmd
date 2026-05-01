@@ -10,6 +10,8 @@ editor:
 execute:
   cache: true
   cache.lazy: false
+  warning: false
+  message: false
 bibliography: references.bib
 ---
 
@@ -36,16 +38,12 @@ library(sf)
 
 ## Load SNAP Policy Database
 
-[The SNAP Policy
-Database](https://www.ers.usda.gov/data-products/snap-policy-data-sets),
-created by the Food and Nutrition Service, contains data on state-level
-SNAP policies, such as broad-based categorical eligibility (BBCE) rules
-related to income and asset tests. We use SNAP Policy Database data from
-July 2019 and merge in information on exemptions to work requirement
-time limits for able-bodied adults without dependents (ABAWDs), also
-[available via
-FNS](https://fns-prod.azureedge.us/sites/default/files/media/file/FY19-Quarter3-ABAWD-Waiver-Status.pdf)
-for July 2019.
+The SNAP Policy Database, created by the Food and Nutrition Service, 
+contains data on state-level SNAP policies, such as broad-based categorical 
+eligibility (BBCE) rules related to income and asset tests [@snapdb]. We use SNAP 
+Policy Database data from July 2019 and merge in information on exemptions 
+to work requirement time limits for able-bodied adults without dependents
+(ABAWDs), also available via FNS for July 2019 [@fns2019].
 
 ```{r}
 snapdb <- read_xlsx("data/SNAPPolicyDatabase.xlsx", sheet = "SNAP Policy Database") |>
@@ -68,7 +66,7 @@ snapdb <- snapdb |>
 ```
 
 ## Load SIPP 2019
-The core dataset for our microsimulation comes from the Survey of Income and Program Participation (SIPP), a longitudinal panel survey of US households that contains rich data on income, assets, and participation in public programs. We use data from 2019, which includes the 2018 and 2019 SIPP panels, available from the [Census website](https://www.census.gov/programs-surveys/sipp/data/datasets/2019-data/2019.html).
+The core dataset for our microsimulation comes from the Survey of Income and Program Participation (SIPP), a longitudinal panel survey of US households that contains rich data on income, assets, and participation in public programs. We use data from 2019, which includes the 2018 and 2019 SIPP panels, available from the Census website [@sipp2019].
 
 ```{r}
 #| cache: false
@@ -140,6 +138,8 @@ sipp2019 <- left_join(pu, rw, by = c("SSUID", "PNUM", "MONTHCODE"))
 Households are uniquely identified in the SIPP by SSUID and SHHADID, but some households may contain multiple SNAP units, defined as people who live and purchase food together. The SIPP does not directly ask about this, but we approximate it based on household relationships. We assume that family members and partners living together are part of the same SNAP unit, while roommates/boarders/other non-family members are not.
 
 ```{r}
+#| output: false
+
 sipp_0719 <- sipp2019 |>
   filter(RIN_UNIV == 1 & MONTHCODE == 7) |>
   mutate(hhid = paste0(as.character(SSUID), as.character(SHHADID))) |>
@@ -204,11 +204,14 @@ get_std_ded <- function(n){
 ## Aggregate to Household-Level SNAP Filing Units
 
 The proceeding code in this section collapses the individual to a group
-level of analysis (SNAP Household) Then at the household level we create
+level of analysis (SNAP Household). Then at the household level we create
 every variable, usually either a binary flag (TRUE or FALSE) or
 continuous limit needed to determine that household's SNAP eligibility.
 In this section we do not fully determine whether a household is
-eligible just simply flag, data needed for determination.
+eligible just simply flag data needed for determination. We use the 
+Congressional Research Service's primer on SNAP eligibility to guide us
+in collecting the information we need to determine eligibility and then
+making those eligibility determinations [@crs2025].
 
 There are 5 sets of determinations we make at this stage:
 
@@ -224,7 +227,12 @@ There are 5 sets of determinations we make at this stage:
     expenses.
 5.  **ABAWD (Able-Bodied Adults without Dependents):** whether the
     household has children, their ages, whether adults works, how old
-    they are, and how much they work per week.
+    they are, whether they are disabled, and how much they work per week. 
+    ABAWDs generally may only receive SNAP benefits for 3 months out of a 
+    3-year period, unless they are working at least 20 hours per week or 
+    participating in training. For simplicity, we assume that any ABAWD 
+    not meeting the requirement in July 2019 is ineligible, unless they 
+    are in a state where the requirements are fully waived.
 
 SNAP filing units are people who live and purchase food together. Given
 that SIPP doesn't account for people who consume food together, we use
@@ -1055,6 +1063,8 @@ visualize_scenario <- function(df, scen) {
 ```
 
 ```{r}
+#| results: 'hide'
+
 visualize_scenario(state_results, scen = "Baseline")
 
 visualize_scenario(state_results, scen = "Gross limit 200% FPL")
