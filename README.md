@@ -1,7 +1,12 @@
-# final_project
+# Final Project - Advanced Data Science
 
 ## Sarah Krause, Miguel Villa, Johnny Willing
 
-The One Big Beautiful Bill Act that passed last year made major changes to the Supplemental Nutritional Assistance Program (SNAP), including expanding work requirements for adults aged 18-64, restricting eligibility for noncitizens, and increasing paperwork and reporting requirements for recipients. These changes have major implications for low-income individuals experiencing food insecurity, and for the over 22 million households receiving SNAP. Our motivating question: How do changes to SNAP eligibility requirements, such as income/ asset thresholds and work requirements, affect the size of the eligible population across states?
+The One Big Beautiful Bill Act made major changes to the Supplemental Nutritional Assistance Program (SNAP), including expanding work requirements for adults aged 18-64, restricting eligibility for noncitizens, and increasing paperwork and reporting requirements for recipients. These changes have major implications for low-income individuals experiencing food insecurity, and for the over 22 million households receiving SNAP. Our motivating question: How do changes to SNAP eligibility requirements, such as income/ asset thresholds and work requirements, affect the size of the eligible population across states?
+
+This repository seeks to answer this question and is organized under this html: 
+[Main Analysis (includes our methods and results)](snap_microsim.html) 
+
 For our data, we use the Survey of Income and Program Participation (SIPP)’s data from July 2019, since SNAP eligibility rules have changed over time. We selected 2019 because it was the last year where data about eligibility requirements is available in the SNAP Policy Database. After merging the SNAP Policy Database to the SIPP’s July 2019 data, we aggregated to the SNAP household level. SNAP filing units live and purchase food together, but since SIPP does not track this exact information, we define a SNAP household in the SIPP to include family members and partners living together, while roommates/boarders/other non-family members are not. Then, we created a SNAP eligibility microsimulation that simulates how eligibility rates change based on different income, asset, and ABAWD work requirement policy levers. 
+
 At the national level and by state, we simulated the following scenarios: baseline July 2019 eligibility rates, setting the gross income limit at 200% of the federal poverty line, eliminating broad-based categorical eligibility, eliminating the asset test, raising the asset limit to $10k, waiving ABAWD work requirements, fully enforcing ABAWD work requirements, requiring a minimum of 30 work hours, setting a cutoff age for dependent at 5 years old, and applying ABAWD work requirements to ages 18-65.
