@@ -2,6 +2,7 @@
 title: "SNAP Eligibility Microsimulation"
 format:
   html:
+    code-fold: true
     embed-resources: true
 editor:
   markdown:
@@ -9,8 +10,7 @@ editor:
 execute:
   cache: true
   cache.lazy: false
-  warning: false
-  message: false
+bibliography: references.bib
 ---
 
 ## Overview
@@ -23,16 +23,13 @@ scenarios.
 ## Libraries
 
 ```{r}
+#| warning: false
+#| message: false
 #| cache: false
 library(tidyverse)
 library(readxl)
 library(data.table)
 library(bit64)
-library(skimr)
-library(sf)
-library(tigris)
-library(scales)
-library(ggrepel)
 ```
 
 ## Load SNAP Policy Database
@@ -170,15 +167,26 @@ sipp_0719 |>
 
 ## FPL and Deduction Limits
 
+In this section we set the baseline federal poverty limit (FPL),
+standard deduction, and maximum shelter deductions set by the USDA FNS.
+
+For each SNAP household, we find the 2019 federal poverty level using
+the The U.S. Department of Health and Human Service's published
+guidelines, divided by 12 to specifically capture monthly poverty level.
+[@2019pov]. We use a vectorized approach for baseline FPL limits, which
+then allows us to modify them to set limit simulations later on. While,
+Alaska, Guam, and Hawaii have varying FPL limits, to capture their
+differential costs of living, given their small sample size in the SIPP,
+we did not include their specific FPL's. The standard deduction and
+shelter deduction are set by FNS [@fns2018]
+
 ```{r}
 # 2019 monthly FPL (contiguous 48 states and DC)
-# https://aspe.hhs.gov/topics/poverty-economic-mobility/poverty-guidelines/prior-hhs-poverty-guidelines-federal-register-references/2019-poverty-guidelines 
 fpl_monthly    <- c(1041, 1410, 1778, 2146, 2515, 2883, 3251, 3620)
 fpl_additional <- 369
 
 # 2019 standard deductions by household size (caps at 6)
-# https://cvlas.org/wp-content/uploads/2022/08/supp-nutrition-assist-prog-SNAP-2019.pdf
-std_ded_tbl <- c(167, 167, 167, 178, 208, 238)
+std_ded_tbl <- c(164, 164, 164, 174, 204, 234)
 
 # Excess shelter deduction cap for non-elderly/disabled households
 shelter_cap <- 552
@@ -193,24 +201,43 @@ get_std_ded <- function(n){
 
 ## Aggregate to Household-Level SNAP Filing Units
 
+The proceeding code in this section collapses the individual to a group
+level of analysis (SNAP Household) Then at the household level we create
+every variable, usually either a binary flag (TRUE or FALSE) or
+continuous limit needed to determine that household's SNAP eligibility.
+In this section we do not fully determine whether a household is
+eligible just simply flag, data needed for determination.
+
+There are 5 sets of determinations we make at this stage:
+
+1.  **Composition:** number of members of household and whether there is
+    someone who is elderly or disabled in the household. Flags for
+    citizenship and state of residence are also included.
+2.  **Categorical Eligibility:** whether all members of the family
+    receive TANF or SSI.
+3.  **Income and Assets:** the sum of gross income, earned income,
+    countable assets, and vehicle assets.
+4.  **Deductions** (case-specific): whether the household had any child
+    support payments, child care costs, or out-of-pocket medical
+    expenses.
+5.  **ABAWD (Able-Bodied Adults without Dependents):** whether the
+    household has children, their ages, whether adults works, how old
+    they are, and how much they work per week.
+
 SNAP filing units are people who live and purchase food together. Given
 that SIPP doesn't account for people who consume food together, we use
 SSUID to account for the pseudo-economic unit.
 
-[It's important to note the SIPP is very well known for undercounting
-income
-information.](https://www.aeaweb.org/articles?id=10.1257/jep.29.4.199)
+It's important to note the SIPP is very well known for under counting
+income information [@meyer2015]. As such we decided for the purposes of
+this microsimulation exercise to apply a modest income-multiplier to
+account for these instances.
 
-Since we are constructing our own SNAP households based on SNAP
-methodology (based on those who share food), we use the SIPP User
-Guide's recommendation to create household weights by simply taking a
-reference person's weight to represent the snap household. More
-information on this methodology can be found in [Section 7.3.3 of the
-user
-guide.](https://www2.census.gov/programs-surveys/sipp/tech-documentation/methodology/2024_SIPP_Users_Guide.pdf)
-
-Citation: U.S. Census Bureau. (2025). *2024 Survey of Income and Program
-Participation Users' Guide* (July 2025). Section 7.3.3, p. 161.
+Given that we construct our own SNAP households based on SNAP
+methodology (based on those who share food rather than the SIPP
+furnished household ID), we use the SIPP User Guide's recommendation to
+create household weights by simply taking a reference person's weight to
+represent the SNAP household [@smith].
 
 ```{r}
 # Aggregation
@@ -259,15 +286,182 @@ hh_sipp <- sipp_0719 |>
   )
 ```
 
-## Eligibility Function
+## Describing the Aggregated SNAP Household Data
 
-State-level BBCE and vehicle rules are looked up internally from
-`snapdb` using `state_fips`. We hardcoded three national or other
-baseline level policy levers which can then be modified for simulation.
-
-They are income, asset, and abawd work policy levers.
+We examine the distribution of household gross income in the data for
+all households, and households actually receiving SNAP
 
 ```{r}
+#| warning: false
+library(scales)
+# Limit to households earning less than $60k gross income for aesthetic purposes
+inc_cutoff <- hh_sipp |>
+  filter(hh_gross_inc <= 60000)
+ggplot() +
+  # All households earning less than $60k
+  geom_histogram(data = inc_cutoff, 
+                 mapping = aes(x = hh_gross_inc, weight = weight,
+                               fill = "All households"),
+                 bins = 100, alpha = 0.5) +
+  # Households receiving SNAP
+  geom_histogram(data = subset(hh_sipp, snap_actual == TRUE),
+                 mapping = aes(x = hh_gross_inc, weight = weight,
+                               fill = "Households receiving SNAP"),
+                 bins = 100, alpha = 0.5) +
+  scale_fill_manual(values = c("All households" = "red",
+                      "Households receiving SNAP" = "blue")) +
+  scale_y_continuous(labels = label_number(scale_cut = cut_short_scale())) +
+  scale_x_continuous(limits = c(0, 60000), 
+                     labels = dollar_format(prefix = "$")) +
+  labs(title = "Weighted Distribution of Income for Households with <$60k", 
+       subtitle = "For all households and households receiving SNAP",
+       x = "Household gross income", y = "Number of households",
+       fill = "Household") +
+  theme_minimal()
+```
+
+The income distribution is heavily right skewed. The gross income
+distribution of SNAP households has the same shape as for all
+households, but the overall distribution is more concentrated on the
+left, as we expect. Next we examine the distribution of countable assets
+for all households in the data (savings, stocks, money market accounts).
+
+```{r}
+#| warning: false
+hh_sipp |>
+  ggplot() +
+  geom_histogram(mapping = aes(x = countable_assets, weight = weight),
+                 bins = 100) +
+  scale_y_continuous(limits = c(0, 15000000),
+                     labels = label_number(scale_cut = cut_short_scale())) +
+  scale_x_continuous(limits = c(0, 15000000), 
+                     labels = dollar_format(prefix = "$")) +
+  labs(title = "Weighted Distribution of Countable Assets of SIPP SNAP Filing Units",
+       x = "Countable Assets", y = "Number of households") +
+  theme_minimal()
+```
+
+The distribution of countable assets is more heavily right skewed, and
+with a much longer tail. Next we visualize the number of adults in the
+data that meet or don't meet the ABAWD work requirement.
+
+```{r}
+abawd_summary <- hh_sipp |>
+  mutate(
+    abawd_status = case_when(
+      has_ssi | has_tanf ~ "Exempt: SSI/TANF",
+      !has_abawd_age ~ "Exempt: Age out of range",
+      !is.na(youngest_child_age) & youngest_child_age < 18 ~ "Exempt: Has qualifying dependent",
+      has_abawd_age & max_work_hrs >= 20 ~ "ABAWD: Meets work requirement",
+      has_abawd_age & max_work_hrs < 20 ~ "ABAWD: Does not meet requirement",
+      TRUE ~ "Other"
+    ),
+    top_level = if_else(str_starts(abawd_status, "ABAWD"), "Has ABAWD", "No ABAWD")
+  ) |>
+  group_by(top_level, abawd_status) |>
+  summarize(n_weighted = sum(weight, na.rm = TRUE), .groups = "drop") |>
+  mutate(share = n_weighted / sum(n_weighted))
+abawd_summary
+```
+
+```{r}
+# Inner ring - top level
+inner <- abawd_summary |>
+  group_by(top_level) |>
+  summarize(share = sum(share))
+# Outer ring - subsections
+outer <- abawd_summary
+# Colors
+colors <- c("Has ABAWD" = "#d6604d",
+            "ABAWD: Meets work requirement" = "#db7464",
+            "ABAWD: Does not meet requirement" = "#ecb5ac",
+            "No ABAWD" = "#2166ac",
+            "Exempt: SSI/TANF" = "#92c5de",
+            "Exempt: Age out of range" = "#74add1",
+            "Exempt: Has qualifying dependent" = "#4393c3")
+ggplot() +
+  # Inner ring
+  geom_col(data = inner,
+           aes(x = 1, y = share, fill = top_level),
+           width = 0.5) +
+  # Outer ring
+  geom_col(data = outer,
+           aes(x = 2, y = share, fill = abawd_status),
+           width = 0.5) +
+    scale_fill_manual(values = colors) +
+  coord_polar(theta = "y") +
+  xlim(0, 2.5) +  
+  theme_void() +
+  labs(title = "ABAWD Status of SNAP Households",
+       fill = NULL)
+```
+
+Most SNAP households in our data are exempt from ABAWD requirements,
+mainly for being out of the age range. About 1/4 of households have an
+adult that would likely qualify for the ABAWD restrictions, and of those
+households, the qualification is mostly from meeting the work
+requirement.
+
+## Eligibility Function
+
+The goal of this section is to estimate national SNAP household
+eligibility under various sets of simulations. Fundamentally this
+section accomplishes two things.
+
+First, we code three broad categories of policy baselines into the
+function arguments which can then be modified for simulation. These are
+income, asset, and ABAWD work policy baselines. Most of these simply
+just restate the federal guidelines.
+
+-   **Income**: sets the national gross income limit to 130% of FPL and
+    net income limit to 100% of FPL.
+
+    -   Net Income is calculated by subtracting a 20% earned income
+        deduction, a standard deduction, child support/ care costs,
+        excess shelter deduction (housing above 50% of net income, but
+        capped), and medical expenses (elderly and disabled only).
+        Additionally it adjust gross limits for states with broad based
+        categorical eligibility.
+
+-   **Asset**: keeps each state's and the federal asset limit intact.
+    The federal default for assets is \$2250 and vehicle assets are
+    counted using state rules.
+
+-   **ABAWD**: The federal requirement for ABAWD requirements are
+    non-disabled adults aged 18–49 without dependent children must work
+    at least 20 hours per week unless their state has a work exemption.
+    HH's that receive SSI or TANF are exempt. The simulation allows the
+    ABAWD age ceiling, minimum hours, and dependent child age cutoff to
+    be varied as policy parameters.
+
+As such simply applying a data frame to the baseline function, produces
+a baseline SNAP household eligibility simulation.
+
+Secondly, using these baseline levels and the argumentation described
+within the code to 5 categories of eligibility which need to be met for
+SNAP. **Basically they must be income, asset, work, and citizen
+eligible. Or they must meet categorically eligibility and be work and
+citizen eligible.**
+
+-   Categorical Eligibility: Households where all members receive either
+    SSI or TANF automatically pass income and asset tests.
+
+-   Income Eligible (adjusted for BBCE): households must pass both a
+    gross income test a net income test as described earlier, but states
+    with BBCE adjust these limits.
+
+-   Asset Eligibility: Countable assets including accounts, bonds,
+    stocks, vehicles, etc must be below an applicable limit which varies
+    by state, although there are federal limits.
+
+-   Work Eligibility: Basically the process described earlier.
+
+-   Citizen Eligibility: At least one householder must be a U.S citizen
+    or legal permanent resident who entered the country at least 5 years
+    ago.
+
+```{r}
+# SNAP Eligibility determination
 snap_elig_sim <- function(df,
     # Note all of these can be changed as simulations: Income 
     gross_pct = 1.30,     # gross income limit as fraction of FPL (federal default: 1.30)
@@ -354,6 +548,12 @@ snap_elig_sim <- function(df,
 
 ## Scenario Functions
 
+Now that we have our function to simulate SNAP eligibility, we create a
+function to run different SNAP policy scenarios, which will allow us to
+estimate how eligibility rates change as aspects of SNAP policy are
+adjusted. We also write a function to summarize scenarios and calculate
+the number of eligible SNAP households under different policies.
+
 ```{r}
 run_scenario <- function(data, scenario_name, ...) {
   data |>
@@ -368,18 +568,37 @@ summarize_scenario <- function(data) {
       scenario = first(scenario),
       n_eligible_weighted = sum(snap_eligible * weight, na.rm = TRUE),
       n_total_weighted = sum(weight, na.rm = TRUE),
-      pct_eligible= round(weighted.mean(snap_eligible, weight, na.rm = TRUE) * 100, 1))
+      pct_eligible= round(sum(snap_eligible * weight, na.rm = TRUE) /
+                           sum(weight, na.rm = TRUE) * 100, 1))
 }
 ```
 
 ## Run Scenarios at National Level
 
-Roughly [82% of SNAP eligible
-households](https://www.fns.usda.gov/research/snap/state-participation-rates/2019#:~:text=Key%20Findings,Page%20updated:%20April%2018%2C%202025)
-participate in snap in 2019. [July 2019 had 19 million
-households](https://www.fns.usda.gov/pd/supplemental-nutrition-assistance-program-snap).
-As such assuming the SIPP properly captures income, asset information,
-then we should have roughly 23.5 million households.
+Roughly participated in snap in 2019 [@reaching]. July 2019 had 19
+million households [@snapdat]. As such assuming the SIPP properly
+captures income, asset information, then we should have roughly 23.5
+million households.
+
+Here, we start by running our baseline scenario for the year and month
+we have chosen (July 2019). This is our baseline for calculating percent
+changes in eligibility under the other scenarios.
+
+**Income.** We have two policy scenarios that adjust how much income is
+needed to qualify for SNAP. First, we change the gross income limit to
+200% of the federal poverty line (FPL). Then, remove broad-based
+categorical eligibility (BBCE).
+
+**Assets.** We have two scenarios that adjust asset limits for SNAP
+eligibility: eliminating the asset test, and raising the asset limit to
+\$10,000.
+
+**Work requirements.** There are several work requirements for SNAP
+eligibility, and we estimate how rates would change if the following
+policies were adopted with respect to work requirements: waive ABAWD,
+fully enforce ABAWD, require a minimum of 30 hours/week, make the
+dependent age cutoff 5 years old, and apply ABAWD to individuals aged
+18-65.
 
 ```{r}
 # Baseline: 2019 state rules as-is
@@ -436,7 +655,245 @@ results <- bind_rows(
 results
 ```
 
-## Run Scenarios at the State Level
+```{r}
+results |>
+  ggplot(aes(reorder(scenario, pct_eligible), pct_eligible)) +
+  geom_col() +
+  geom_text(aes(label = paste0(pct_eligible, "%")), hjust = -0.1) +
+  coord_flip() +
+  scale_y_continuous(
+    expand = expansion(mult = c(0, 0.15)),
+    labels = scales::label_percent(scale = 1)) +
+  labs(
+    title = "SNAP Eligibility Rate by Policy Scenario",
+    x = NULL,
+    y = "% Eligible") +
+  theme_minimal()
+```
+
+### Baseline Income Distribution of SNAP eligibility
+
+**Income Decile:**
+
+First we want to understand the underlying income distribution of SNAP
+households to be able to model how this changes under various policy
+specifications. We first look at income decile eligibility distribution.
+
+```{r}
+distributional_table <- baseline |>
+  mutate(inc_decile = ntile(hh_gross_inc, n = 10)) |>
+  group_by(inc_decile) |>
+  summarize(
+    min_income = min(hh_gross_inc),
+    max_income = max(hh_gross_inc),
+    pct_eligible = round(weighted.mean(snap_eligible, weight, na.rm = TRUE) * 100, 1),
+    n_eligible_weighted = sum(snap_eligible * weight, na.rm = TRUE)
+  )
+
+distributional_table
+```
+
+```{r}
+distributional_table |>
+  ggplot(aes(inc_decile, pct_eligible)) +
+  geom_col() +
+  geom_text(aes(label = paste0(pct_eligible, "%")), vjust = -1) +
+  scale_x_continuous(breaks = 1:10) +
+  scale_y_continuous(
+    expand = expansion(mult = c(0, 0.1)),
+    labels = scales::label_percent(scale = 1)) +
+  labs(
+    title = "SNAP Eligibility Rate by Household Income Decile (Baseline 2019)",
+    x = "Household Income Decile",
+    y = "% Eligible") +
+  theme_minimal()
+
+```
+
+It'll be difficult to demonstrate a change for every income decile,
+however in our analysis we can see that at least half in the bottom 20%
+of the distribution are eligible for SNAP and at least 10% of every
+decile in the bottom 50% is eligible for SNAP. As such the quartile
+distribution may be a better from of reference
+
+**Quartile Distribution:**
+
+```{r}
+quartile_distribution <- baseline |>
+  mutate(inc_quartile = ntile(hh_gross_inc, n = 4)) |>
+  group_by(inc_quartile) |>
+  summarize(
+    min_income = min(hh_gross_inc),
+    max_income = max(hh_gross_inc),
+    pct_eligible = round(weighted.mean(snap_eligible, weight, na.rm = TRUE) * 100, 1),
+    n_eligible_weighted = sum(snap_eligible * weight, na.rm = TRUE)) |>
+  ggplot(aes(inc_quartile, pct_eligible)) +
+  geom_col() +
+  geom_text(aes(label = paste0(pct_eligible, "%")), vjust = -1) +
+  scale_x_continuous(breaks = 1:4) +
+  scale_y_continuous(
+    expand = expansion(mult = c(0, 0.1)),
+    labels = scales::label_percent(scale = 1)) +
+  labs(
+    title = "SNAP Eligibility Rate by Household Income Quartile (Baseline 2019)",
+    x = "Household Income Quartile",
+    y = "% Eligible") +
+  theme_minimal()
+
+quartile_distribution
+```
+
+This suggests that the bottom quarter is most directly impacted by our
+SNAP eligibility formula. However, at least 15% of the next quartile is
+also impacted. We take the bottom quarter of the population and model
+how their eligibility changes nationally under the different simulation.
+
+### Income Distribution of SNAP eligibility by Simulated Scenario
+
+**Bottom Quartile by Simulation**
+
+```{r}
+bind_rows(baseline, income_200pct, income_no_bbce, asset_elim, asset_10k,
+          work_waive, work_enforce, work_30hrs, work_dep5, work_age65) |>
+  group_by(scenario) |>
+  mutate(inc_quartile = ntile(hh_gross_inc, n = 4)) |>
+  filter(inc_quartile == 1) |>
+  summarize(
+    pct_eligible = round(weighted.mean(snap_eligible, weight, na.rm = TRUE) * 100, 1)
+  ) |>
+  ggplot(aes(reorder(scenario, pct_eligible), pct_eligible)) +
+  geom_col() +
+  geom_text(aes(label = paste0(pct_eligible, "%")), hjust = -0.1) +
+  coord_flip() +
+  scale_y_continuous(
+    expand = expansion(mult = c(0, 0.15)),
+    labels = scales::label_percent(scale = 1)) +
+  labs(
+    title = "SNAP Eligibility in Bottom Income Quartile by Scenario",
+    x = NULL,
+    y = "% Eligible") +
+  theme_minimal()
+```
+
+**Second Bottom Quartile by Simulation**
+
+```{r}
+bind_rows(baseline, income_200pct, income_no_bbce, asset_elim, asset_10k,
+          work_waive, work_enforce, work_30hrs, work_dep5, work_age65) |>
+  group_by(scenario) |>
+  mutate(inc_quartile = ntile(hh_gross_inc, n = 4)) |>
+  filter(inc_quartile == 2) |>
+  summarize(
+    pct_eligible = round(weighted.mean(snap_eligible, weight, na.rm = TRUE) * 100, 1)) |>
+  ggplot(aes(reorder(scenario, pct_eligible), pct_eligible)) +
+  geom_col() +
+  geom_text(aes(label = paste0(pct_eligible, "%")), hjust = -0.1) +
+  coord_flip() +
+  scale_y_continuous(
+    expand = expansion(mult = c(0, 0.15)),
+    labels = scales::label_percent(scale = 1)) +
+  labs(
+    title = "SNAP Eligibility in Second Income Quartile by Scenario",
+    x = NULL,
+    y = "% Eligible") +
+  theme_minimal()
+```
+
+Across the bottom half of the income distribution patterns emerge:
+
+1.  BBCE helps ensure lower income families can have access to food
+    assistance and are the single biggest driver SNAP participation in
+    our models.
+2.  OBBBA style reforms (ABAWD work requirements) are the most
+    regressive and lower families SNAP eligibility across the board.
+    1.  **In the lowest quartile simply expanding the ABAWD age range
+        from up to 49 to 65 means 5% of families in the lowest quartile
+        lose SNAP.**
+
+**We can also just for the sake of depth look at the distributions for
+each policy by quartile**
+
+```{r}
+bind_rows(baseline, income_200pct, income_no_bbce, asset_elim, asset_10k,
+          work_waive, work_enforce, work_30hrs, work_dep5, work_age65) |>
+  group_by(scenario) |>
+  mutate(inc_quartile = ntile(hh_gross_inc, n = 4)) |>
+  group_by(scenario, inc_quartile) |>
+  summarize(
+    pct_eligible = round(weighted.mean(snap_eligible, weight, na.rm = TRUE) * 100, 1),
+    .groups = "drop") |>
+  ggplot(aes(x = factor(inc_quartile), y = reorder(scenario, pct_eligible), fill = pct_eligible)) +
+  geom_tile(color = "white") +
+  geom_text(aes(label = paste0(pct_eligible, "%")), size = 3.2) +
+  scale_fill_gradient(low = "white", high = "#2166ac",
+                      name = "% Eligible") +
+  labs(
+    title = "SNAP Eligibility Rate by Income Quartile and Scenario",
+    x = "Income Quartile",
+    y = NULL
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(panel.grid = element_blank())
+```
+
+This generally doesn't reveal anything too stark about SNAP however it
+does indicate that BBCE policies also affect those who aren't
+necessarily in the bottom half of the distribution.
+
+### Pseudo OBBBA ABAWD Work Requirement Simulation
+
+All of the prior simulations only toggle one scenario at a time.
+However, if we edit the scenarios by raising the age of exemption to 65
+and edit the dependent child clause to not exempt families where the
+youngest child is over 14 then we can somewhat model OBBBA. We can't
+necessarily cover some of the provisions like stricter work waivers or
+cost share behavorial responses however.
+
+```{r}
+obbba_simulation <- run_scenario(hh_sipp, "OBBBA (approx.)",
+                                 abawd_max_age = 65,
+                                 dep_age = 14)
+```
+
+```{r}
+bind_rows(
+  summarize_scenario(baseline),
+  summarize_scenario(obbba_simulation)) |>
+  ggplot(aes(reorder(scenario, pct_eligible), pct_eligible)) +
+  geom_col() +
+  geom_text(aes(label = paste0(pct_eligible, "%")), vjust = -0.5) +
+  scale_y_continuous(
+    expand = expansion(mult = c(0, 0.15)),
+    labels = scales::label_percent(scale = 1)) +
+  labs(
+    title = "SNAP Eligibility: Baseline vs. OBBBA Work Requirement Changes",
+    x = NULL,
+    y = "% Eligible") +
+  theme_minimal()
+```
+
+## State-level eligibility estimations
+
+For baseline eligibility in July 2019, we estimate that approximately 26
+million households are eligible for SNAP. This is similar to the 23.5
+million that we expected. Adjusting the gross income limit to 200% of
+the FPL minimally increases the number of eligible households by 0.5
+percent from baseline, while enforcing ABAWD nationally decreases the
+eligibility rate by 0.5 percent. The greatest estimated changed from
+baseline is eliminating categorical eligibility and applying only
+federal eligibility rules nationally. We estimate that the number of
+eligible households would decrease to about 17 million households, a
+decrease of 35.4 percent. Eliminating the asset test and waiving ABAWD
+nationally are both estimated to increase eligibility rates by about 13
+percent, to about 29.6 million eligible households.
+
+### State-level results
+
+Because states have different baseline eligibility rates, and baseline
+SNAP eligibility rules, we are also interested in summarizing how these
+different policy changes would change eligibility rates at the state
+level. We write a function to summarize the estimated number of eligible
+households for each state.
 
 ```{r}
 summarize_by_state <- function(data) {
@@ -445,11 +902,14 @@ summarize_by_state <- function(data) {
     summarize(
       n_eligible_weighted = sum(snap_eligible * weight, na.rm = TRUE),
       n_total_weighted    = sum(weight, na.rm = TRUE),
-      pct_eligible        = round(weighted.mean(snap_eligible, weight, na.rm = TRUE) * 100, 1),
+      pct_eligible = round(weighted.mean(snap_eligible, weight, na.rm = TRUE) * 100, 1),
       .groups = "drop"
     )
 }
 ```
+
+Next, we generate the same policy scenarios described above, but
+summarized for their impact on each state's eligibility rates.
 
 ```{r}
 # Baseline
@@ -506,8 +966,7 @@ state_results <- bind_rows(baseline_state, twohundred_state,
                            work_dep5_state, work_age65_state) |>
   group_by(state_fips) |>
   mutate(change_from_baseline = n_eligible_weighted - n_eligible_weighted[scenario == "Baseline"],
-         pct_change = round(100 * change_from_baseline / n_eligible_weighted[scenario == "Baseline"],
-                            1)) |>
+         pct_change = round(100 * change_from_baseline / n_eligible_weighted[scenario == "Baseline"],1)) |>
   ungroup() |>
   arrange(state_fips)
 
