@@ -30,6 +30,8 @@ library(tidyverse)
 library(readxl)
 library(data.table)
 library(bit64)
+library(tigris)
+library(sf)
 ```
 
 ## Load SNAP Policy Database
